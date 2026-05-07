@@ -37,23 +37,3 @@ Map<String, dynamic> _$TeacherModelToJson(_TeacherModel instance) =>
       'profileImage': instance.profileImage,
       'isAvailable': instance.isAvailable,
     };
-
-_UpcomingClassModel _$UpcomingClassModelFromJson(Map<String, dynamic> json) =>
-    _UpcomingClassModel(
-      id: json['id'] as String,
-      studentName: json['studentName'] as String,
-      studentImage: json['studentImage'] as String,
-      time: json['time'] as String,
-      subject: json['subject'] as String,
-      status: json['status'] as String? ?? 'upcoming',
-    );
-
-Map<String, dynamic> _$UpcomingClassModelToJson(_UpcomingClassModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'studentName': instance.studentName,
-      'studentImage': instance.studentImage,
-      'time': instance.time,
-      'subject': instance.subject,
-      'status': instance.status,
-    };

@@ -1,0 +1,172 @@
+﻿Analyzing quran_learning_app...                                 
+
+  error - The name 'AvailabilityScreen' isn't a class - lib\core\navigation\app_router.dart:90:44 - creation_with_non_type
+  error - The name 'BookingsScreen' isn't a class - lib\core\navigation\app_router.dart:95:44 - creation_with_non_type
+  error - The method 'ClassScreen' isn't defined for the type 'AppRouter' - lib\core\navigation\app_router.dart:102:18 - undefined_method
+  error - The method 'ProgressNotesScreen' isn't defined for the type 'AppRouter' - lib\core\navigation\app_router.dart:114:18 - undefined_method
+  error - The name 'StudentDashboardScreen' isn't a class - lib\core\navigation\app_router.dart:125:44 - creation_with_non_type
+  error - The name 'TeacherListScreen' isn't a class - lib\core\navigation\app_router.dart:130:44 - creation_with_non_type
+  error - The method 'StudentBookingScreen' isn't defined for the type 'AppRouter' - lib\core\navigation\app_router.dart:137:18 - undefined_method
+  error - The name 'TeacherListModel' isn't a type, so it can't be used in an 'as' expression - lib\core\navigation\app_router.dart:138:42 - cast_to_non_type
+  error - The name 'StudentScheduleScreen' isn't a class - lib\core\navigation\app_router.dart:145:44 - creation_with_non_type
+  error - The name 'StudentProgressScreen' isn't a class - lib\core\navigation\app_router.dart:150:44 - creation_with_non_type
+  error - The name 'SubscriptionScreen' isn't a class - lib\core\navigation\app_router.dart:155:44 - creation_with_non_type
+  error - The method 'StudentClassScreen' isn't defined for the type 'AppRouter' - lib\core\navigation\app_router.dart:162:18 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\availability_screen.dart:111:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\booking_screen.dart:118:41 - deprecated_member_use
+  error - The getter 'chatList' isn't defined for the type 'AppRoutes' - lib\features\teacher\chat_conversation_screen.dart:111:47 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\chat_conversation_screen.dart:214:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\chat_conversation_screen.dart:325:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\chat_conversation_screen.dart:348:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\chat_list_screen.dart:79:41 - deprecated_member_use
+  error - The getter 'chatConversation' isn't defined for the type 'AppRoutes' - lib\features\teacher\chat_list_screen.dart:127:39 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\chat_list_screen.dart:167:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\chat_list_screen.dart:180:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\class_screen.dart:176:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\class_screen.dart:211:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\progress_note_screen.dart:164:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\progress_note_screen.dart:171:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\progress_note_screen.dart:237:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\progress_note_screen.dart:320:33 - deprecated_member_use
+  error - Undefined class 'TeacherListModel' - lib\features\teacher\student_booking_screen.dart:8:9 - undefined_class
+  error - Undefined name 'studentBookingProvider' - lib\features\teacher\student_booking_screen.dart:22:16 - undefined_identifier
+  error - Undefined name 'studentBookingProvider' - lib\features\teacher\student_booking_screen.dart:28:29 - undefined_identifier
+  error - Undefined name 'studentBookingProvider' - lib\features\teacher\student_booking_screen.dart:29:31 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_booking_screen.dart:112:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_booking_screen.dart:119:53 - deprecated_member_use
+  error - Undefined class 'StudentBookingState' - lib\features\teacher\student_booking_screen.dart:191:5 - undefined_class
+  error - Undefined class 'StudentBookingNotifier' - lib\features\teacher\student_booking_screen.dart:192:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_booking_screen.dart:222:57 - deprecated_member_use
+  error - Undefined class 'StudentBookingState' - lib\features\teacher\student_booking_screen.dart:245:5 - undefined_class
+  error - Undefined class 'StudentBookingNotifier' - lib\features\teacher\student_booking_screen.dart:246:5 - undefined_class
+  error - Undefined class 'StudentBookingState' - lib\features\teacher\student_booking_screen.dart:305:5 - undefined_class
+  error - Undefined class 'StudentBookingNotifier' - lib\features\teacher\student_booking_screen.dart:306:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_booking_screen.dart:321:33 - deprecated_member_use
+  error - Undefined class 'StudentBookingState' - lib\features\teacher\student_booking_screen.dart:371:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_booking_screen.dart:384:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_class_screen.dart:174:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_class_screen.dart:209:38 - deprecated_member_use
+  error - Undefined name 'studentDashboardProvider' - lib\features\teacher\student_dashboard_screen.dart:15:29 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_dashboard_screen.dart:211:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_dashboard_screen.dart:256:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\student_dashboard_screen.dart:257:30 - deprecated_member_use
+  error - The getter 'white80' isn't defined for the type 'Colors' - lib\features\teacher\student_dashboard_screen.dart:287:37 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\booking_card.dart:30:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\booking_card.dart:44:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\booking_card.dart:237:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\booking_card.dart:239:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\day_availability_tile.dart:35:33 - deprecated_member_use
+  error - Undefined name 'studentScheduleProvider' - lib\features\teacher\widget\schedule_screen.dart:13:29 - undefined_identifier
+  error - Undefined name 'studentScheduleProvider' - lib\features\teacher\widget\schedule_screen.dart:14:31 - undefined_identifier
+  error - Undefined name 'AppRoutes' - lib\features\teacher\widget\schedule_screen.dart:68:29 - undefined_identifier
+  error - Undefined class 'StudentScheduleNotifier' - lib\features\teacher\widget\schedule_screen.dart:113:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\schedule_screen.dart:126:41 - deprecated_member_use
+  error - Undefined class 'StudentScheduleNotifier' - lib\features\teacher\widget\schedule_screen.dart:189:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\stats_card.dart:28:33 - deprecated_member_use
+  error - Undefined class 'StudentUpcomingClassModel' - lib\features\teacher\widget\student_class_card.dart:5:9 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_class_card.dart:30:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_class_card.dart:40:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_class_card.dart:135:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_class_card.dart:137:61 - deprecated_member_use
+  error - Undefined name 'studentProgressProvider' - lib\features\teacher\widget\student_progress.dart:11:29 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_progress.dart:147:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_progress.dart:155:28 - deprecated_member_use
+  error - Undefined class 'StudentProgressModel' - lib\features\teacher\widget\student_progress.dart:195:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_progress.dart:221:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_progress.dart:231:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_progress.dart:301:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\student_progress.dart:303:57 - deprecated_member_use
+  error - Undefined name 'subscriptionProvider' - lib\features\teacher\widget\subscription_screen.dart:12:29 - undefined_identifier
+  error - Undefined name 'subscriptionProvider' - lib\features\teacher\widget\subscription_screen.dart:13:31 - undefined_identifier
+  error - Undefined class 'SubscriptionPlanModel' - lib\features\teacher\widget\subscription_screen.dart:142:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\subscription_screen.dart:164:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\subscription_screen.dart:165:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\subscription_screen.dart:265:59 - deprecated_member_use
+  error - Undefined class 'SubscriptionState' - lib\features\teacher\widget\subscription_screen.dart:305:5 - undefined_class
+  error - Undefined class 'SubscriptionNotifier' - lib\features\teacher\widget\subscription_screen.dart:306:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\subscription_screen.dart:321:33 - deprecated_member_use
+  error - Undefined class 'SubscriptionState' - lib\features\teacher\widget\subscription_screen.dart:372:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\subscription_screen.dart:385:47 - deprecated_member_use
+  error - The getter 'chatList' isn't defined for the type 'AppRoutes' - lib\features\teacher\widget\teacher_bottom_nav.dart:61:30 - undefined_getter
+  error - Undefined class 'TeacherListModel' - lib\features\teacher\widget\teacher_card.dart:5:9 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\teacher_card.dart:23:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\teacher_card.dart:36:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\teacher_card.dart:72:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\teacher_card.dart:73:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\teacher_card.dart:148:49 - deprecated_member_use
+  error - Undefined name 'teacherListProvider' - lib\features\teacher\widget\teacher_list_screen.dart:14:29 - undefined_identifier
+  error - Undefined name 'teacherListProvider' - lib\features\teacher\widget\teacher_list_screen.dart:15:31 - undefined_identifier
+  error - Undefined class 'TeacherListNotifier' - lib\features\teacher\widget\teacher_list_screen.dart:123:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\teacher_list_screen.dart:133:41 - deprecated_member_use
+  error - Undefined class 'TeacherListNotifier' - lib\features\teacher\widget\teacher_list_screen.dart:160:5 - undefined_class
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\upcoming_class_card.dart:28:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\teacher\widget\upcoming_class_card.dart:38:53 - deprecated_member_use
+  error - Target of URI doesn't exist: 'package:quran_learning_app/models/student/student_model.freezed.dart' - lib\models\student\student_model.dart:3:6 - uri_does_not_exist
+  error - Target of URI hasn't been generated: 'package:quran_learning_app/models/student/student_model.g.dart' - lib\models\student\student_model.dart:4:6 - uri_has_not_been_generated
+  error - The name '_StudentModel' isn't a type and can't be used in a redirected constructor - lib\models\student\student_model.dart:18:8 - redirect_to_non_class
+  error - The method '_$StudentModelFromJson' isn't defined for the type 'StudentModel' - lib\models\student\student_model.dart:21:7 - undefined_method
+  error - The name '_TeacherListModel' isn't a type and can't be used in a redirected constructor - lib\models\student\student_model.dart:36:8 - redirect_to_non_class
+  error - The method '_$TeacherListModelFromJson' isn't defined for the type 'TeacherListModel' - lib\models\student\student_model.dart:39:7 - undefined_method
+  error - The name '_StudentUpcomingClassModel' isn't a type and can't be used in a redirected constructor - lib\models\student\student_model.dart:52:8 - redirect_to_non_class
+  error - The method '_$StudentUpcomingClassModelFromJson' isn't defined for the type 'StudentUpcomingClassModel' - lib\models\student\student_model.dart:55:7 - undefined_method
+  error - The name '_StudentProgressModel' isn't a type and can't be used in a redirected constructor - lib\models\student\student_model.dart:69:8 - redirect_to_non_class
+  error - The method '_$StudentProgressModelFromJson' isn't defined for the type 'StudentProgressModel' - lib\models\student\student_model.dart:72:7 - undefined_method
+  error - The name '_SubscriptionPlanModel' isn't a type and can't be used in a redirected constructor - lib\models\student\student_model.dart:85:8 - redirect_to_non_class
+  error - The method '_$SubscriptionPlanModelFromJson' isn't defined for the type 'SubscriptionPlanModel' - lib\models\student\student_model.dart:88:7 - undefined_method
+  error - The name '_SlotModel' isn't a type and can't be used in a redirected constructor - lib\models\student\student_model.dart:98:8 - redirect_to_non_class
+  error - The method '_$SlotModelFromJson' isn't defined for the type 'SlotModel' - lib\models\student\student_model.dart:101:7 - undefined_method
+  error - The getter 'isAvailable' isn't defined for the type 'SlotModel' - lib\provider\student\student_booking_provider.dart:89:15 - undefined_getter
+  error - The method 'copyWith' isn't defined for the type 'SlotModel' - lib\provider\student\student_booking_provider.dart:91:16 - undefined_method
+  error - The getter 'id' isn't defined for the type 'SlotModel' - lib\provider\student\student_booking_provider.dart:91:39 - undefined_getter
+  error - The getter 'id' isn't defined for the type 'SlotModel' - lib\provider\student\student_booking_provider.dart:91:50 - undefined_getter
+   info - The imported package 'quran_learning_academy' isn't a dependency of the importing package - lib\provider\student\student_progress_provider.dart:2:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:quran_learning_academy/models/student/student_model.dart' - lib\provider\student\student_progress_provider.dart:2:8 - uri_does_not_exist
+  error - The name 'StudentProgressModel' isn't a type, so it can't be used as a type argument - lib\provider\student\student_progress_provider.dart:5:14 - non_type_as_type_argument
+  error - The name 'StudentProgressModel' isn't a type, so it can't be used as a type argument - lib\provider\student\student_progress_provider.dart:18:10 - non_type_as_type_argument
+  error - Classes can only extend other classes - lib\provider\student\student_progress_provider.dart:33:39 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\provider\student\student_progress_provider.dart:34:37 - extra_positional_arguments
+  error - The name 'StudentProgressModel' isn't a class - lib\provider\student\student_progress_provider.dart:40:13 - creation_with_non_type
+  error - The name 'StudentProgressModel' isn't a class - lib\provider\student\student_progress_provider.dart:51:13 - creation_with_non_type
+  error - The name 'StudentProgressModel' isn't a class - lib\provider\student\student_progress_provider.dart:61:13 - creation_with_non_type
+  error - Undefined name 'state' - lib\provider\student\student_progress_provider.dart:73:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\student_progress_provider.dart:73:13 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\provider\student\student_progress_provider.dart:82:5 - undefined_function
+  error - Classes can only extend other classes - lib\provider\student\student_provider.dart:30:40 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\provider\student\student_provider.dart:31:38 - extra_positional_arguments
+  error - Undefined name 'state' - lib\provider\student\student_provider.dart:74:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\student_provider.dart:74:13 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\provider\student\student_provider.dart:79:5 - undefined_function
+   info - The imported package 'quran_learning_academy' isn't a dependency of the importing package - lib\provider\student\student_schedule_provider.dart:2:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:quran_learning_academy/models/student/student_model.dart' - lib\provider\student\student_schedule_provider.dart:2:8 - uri_does_not_exist
+  error - The getter 'id' isn't defined for the type 'StudentUpcomingClassModel' - lib\provider\student\student_schedule_provider.dart:102:25 - undefined_getter
+  error - The getter 'id' isn't defined for the type 'SubscriptionPlanModel' - lib\provider\student\subscription_provider.dart:32:28 - undefined_getter
+  error - Classes can only extend other classes - lib\provider\student\subscription_provider.dart:35:36 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\provider\student\subscription_provider.dart:36:34 - extra_positional_arguments
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:88:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:88:13 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:92:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:92:13 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:96:9 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:97:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:97:13 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:99:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\subscription_provider.dart:99:13 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\provider\student\subscription_provider.dart:104:5 - undefined_function
+  error - Classes can only extend other classes - lib\provider\student\teacher_list_provider.dart:36:35 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\provider\student\teacher_list_provider.dart:37:33 - extra_positional_arguments
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:95:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:95:13 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:99:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:99:13 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:104:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:104:13 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:109:16 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:111:9 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:116:19 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:120:48 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:126:9 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:128:41 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:132:5 - undefined_identifier
+  error - Undefined name 'state' - lib\provider\student\teacher_list_provider.dart:132:13 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\provider\student\teacher_list_provider.dart:137:5 - undefined_function
+

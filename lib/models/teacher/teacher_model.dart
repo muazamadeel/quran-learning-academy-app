@@ -1,9 +1,12 @@
+// lib/models/teacher/teacher_model.dart
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'teacher_model.freezed.dart';
 part 'teacher_model.g.dart';
 
-@Freezed()
+@freezed
 abstract class TeacherModel with _$TeacherModel {
   const factory TeacherModel({
     required String id,
@@ -23,18 +26,21 @@ abstract class TeacherModel with _$TeacherModel {
       _$TeacherModelFromJson(json);
 }
 
-// Upcoming Class Model
-@Freezed()
-abstract class UpcomingClassModel with _$UpcomingClassModel {
-  const factory UpcomingClassModel({
-    required String id,
-    required String studentName,
-    required String studentImage,
-    required String time,
-    required String subject,
-    @Default('upcoming') String status,
-  }) = _UpcomingClassModel;
-
-  factory UpcomingClassModel.fromJson(Map<String, dynamic> json) =>
-      _$UpcomingClassModelFromJson(json);
+extension TeacherModelX on TeacherModel {
+  static TeacherModel fromFirestore(DocumentSnapshot doc) {
+    final d = doc.data() as Map<String, dynamic>;
+    return TeacherModel(
+      id: doc.id,
+      name: d['name'] ?? '',
+      email: d['email'] ?? '',
+      experience: d['experience'] ?? '',
+      languages: List<String>.from(d['languages'] ?? []),
+      rating: (d['rating'] as num?)?.toDouble() ?? 0.0,
+      totalStudents: (d['totalStudents'] as num?)?.toInt() ?? 0,
+      todayClasses: (d['todayClasses'] as num?)?.toInt() ?? 0,
+      monthEarnings: (d['monthEarnings'] as num?)?.toDouble() ?? 0.0,
+      profileImage: d['profileImage'] ?? '',
+      isAvailable: d['isAvailable'] ?? true,
+    );
+  }
 }

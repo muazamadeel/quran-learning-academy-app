@@ -1,11 +1,18 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:quran_learning_app/core/navigation/app_router.dart';
+import 'package:quran_learning_app/core/theme/app_theme.dart';
+import 'package:quran_learning_app/models/chat/chat_model.dart';
+import 'package:quran_learning_app/provider/chat_provider.dart';
 import 'package:quran_learning_app/provider/class_provider.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../../core/navigation/app_router.dart';
+// ═══════════════════════════════════════════════════════════════════════════
+// CLASS SCREEN — Teacher's Virtual Classroom
+// ═══════════════════════════════════════════════════════════════════════════
 
 class ClassScreen extends ConsumerStatefulWidget {
   final String studentName;
@@ -173,9 +180,9 @@ class _ClassScreenState extends ConsumerState<ClassScreen> {
         children: [
           CircleAvatar(
             radius: width * 0.13,
-            backgroundColor: AppColors.primaryGreen.withOpacity(0.3),
+            backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.3),
             child: Text(
-              widget.studentName[0],
+              widget.studentName.isNotEmpty ? widget.studentName[0] : '?',
               style: TextStyle(
                 color: AppColors.white,
                 fontSize: width * 0.1,
@@ -208,7 +215,7 @@ class _ClassScreenState extends ConsumerState<ClassScreen> {
       height: height * 0.15,
       decoration: BoxDecoration(
         color: isVideoOn
-            ? AppColors.primaryGreen.withOpacity(0.3)
+            ? AppColors.primaryGreen.withValues(alpha: 0.3)
             : Colors.grey[800],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.white, width: 1.5),
@@ -291,7 +298,9 @@ class _ClassScreenState extends ConsumerState<ClassScreen> {
             isActive: false,
             width: width,
             height: height,
-            onTap: () {},
+            onTap: () {
+              // Open chat overlay or navigate to chat room
+            },
           ),
           _ControlButton(
             icon: Icons.call_end,
@@ -402,6 +411,352 @@ class _ControlButton extends StatelessWidget {
             style: TextStyle(color: Colors.white70, fontSize: width * 0.028),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHAT ROOM SCREEN — The actual messaging UI
+// ═══════════════════════════════════════════════════════════════════════════
+
+class ChatRoomScreen extends ConsumerStatefulWidget {
+  final String roomId;
+  final String studentName;
+  final String studentImage;
+  final String studentId;
+
+  const ChatRoomScreen({
+    super.key,
+    required this.roomId,
+    required this.studentName,
+    required this.studentImage,
+    required this.studentId,
+  });
+
+  @override
+  ConsumerState<ChatRoomScreen> createState() => _ChatRoomScreenState();
+}
+
+class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
+  final TextEditingController _msgCtrl = TextEditingController();
+  final ScrollController _scrollCtrl = ScrollController();
+  final String _myUid = FirebaseAuth.instance.currentUser!.uid;
+
+  bool _isSending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatActionsProvider.notifier).markMessagesRead(widget.roomId);
+    });
+  }
+
+  @override
+  void dispose() {
+    _msgCtrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (_scrollCtrl.hasClients) {
+      _scrollCtrl.animateTo(
+        _scrollCtrl.position.maxScrollExtent + 100,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  Future<void> _send() async {
+    final text = _msgCtrl.text.trim();
+    if (text.isEmpty || _isSending) return;
+
+    setState(() => _isSending = true);
+    _msgCtrl.clear();
+
+    try {
+      await ref
+          .read(chatActionsProvider.notifier)
+          .sendMessage(roomId: widget.roomId, text: text);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to send: $e'),
+            backgroundColor: AppColors.rejected,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    final h = MediaQuery.of(context).size.height;
+    final messagesAsync = ref.watch(messagesProvider(widget.roomId));
+
+    ref.listen(messagesProvider(widget.roomId), (prev, next) {
+      if (next.hasValue) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+      }
+    });
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Column(
+        children: [
+          _buildHeader(context, w, h),
+          Expanded(
+            child: messagesAsync.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryGreen),
+              ),
+              error: (e, _) => Center(child: Text('Error: $e')),
+              data: (messages) {
+                if (messages.isEmpty) return _buildEmptyChat(w, h);
+                return ListView.builder(
+                  controller: _scrollCtrl,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: w * 0.04,
+                    vertical: h * 0.015,
+                  ),
+                  itemCount: messages.length,
+                  itemBuilder: (_, i) {
+                    final msg = messages[i];
+                    final isMe = msg.senderId == _myUid;
+                    final showDate =
+                        i == 0 ||
+                        !_isSameDay(messages[i - 1].createdAt, msg.createdAt);
+
+                    return Column(
+                      children: [
+                        if (showDate) _buildDateChip(msg.createdAt, w),
+                        _MessageBubble(msg: msg, isMe: isMe, w: w, h: h),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          _buildInputBar(w, h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, double w, double h) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + h * 0.01,
+        bottom: h * 0.015,
+        left: w * 0.03,
+        right: w * 0.04,
+      ),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.darkGreen, AppColors.primaryGreen],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          SizedBox(width: w * 0.02),
+          CircleAvatar(
+            radius: w * 0.055,
+            backgroundColor: Colors.white24,
+            backgroundImage: widget.studentImage.isNotEmpty
+                ? NetworkImage(widget.studentImage)
+                : null,
+            child: widget.studentImage.isEmpty
+                ? Text(
+                    widget.studentName.isNotEmpty
+                        ? widget.studentName[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
+          ),
+          SizedBox(width: w * 0.03),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.studentName,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: w * 0.042,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  'Student',
+                  style: TextStyle(color: Colors.white70, fontSize: w * 0.028),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyChat(double w, double h) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.waving_hand_rounded,
+            size: w * 0.1,
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
+          ),
+          SizedBox(height: h * 0.01),
+          Text(
+            'Say Assalam u Alaikum! 👋',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateChip(DateTime? date, double w) {
+    if (date == null) return const SizedBox.shrink();
+    final label = _isToday(date)
+        ? 'Today'
+        : _isYesterday(date)
+        ? 'Yesterday'
+        : DateFormat('MMM d, yyyy').format(date);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: w * 0.02),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.primaryGreen.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: w * 0.028,
+              color: AppColors.primaryGreen,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputBar(double w, double h) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        w * 0.04,
+        h * 0.01,
+        w * 0.04,
+        MediaQuery.of(context).padding.bottom + h * 0.01,
+      ),
+      color: Colors.white,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _msgCtrl,
+              decoration: InputDecoration(
+                hintText: 'Type a message...',
+                filled: true,
+                fillColor: AppColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: w * 0.02),
+          IconButton(
+            icon: Icon(Icons.send_rounded, color: AppColors.primaryGreen),
+            onPressed: _send,
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isSameDay(DateTime? a, DateTime? b) =>
+      a?.year == b?.year && a?.month == b?.month && a?.day == b?.day;
+  bool _isToday(DateTime d) => _isSameDay(d, DateTime.now());
+  bool _isYesterday(DateTime d) =>
+      _isSameDay(d, DateTime.now().subtract(const Duration(days: 1)));
+}
+
+class _MessageBubble extends StatelessWidget {
+  final MessageModel msg;
+  final bool isMe;
+  final double w, h;
+
+  const _MessageBubble({
+    required this.msg,
+    required this.isMe,
+    required this.w,
+    required this.h,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: EdgeInsets.only(bottom: h * 0.01),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isMe ? AppColors.primaryGreen : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              msg.text,
+              style: TextStyle(color: isMe ? Colors.white : AppColors.textDark),
+            ),
+
+            Text(DateFormat('hh:mm a').format(msg.createdAt ?? DateTime.now())),
+          ],
+        ),
       ),
     );
   }

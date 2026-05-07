@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_learning_app/models/class/class_model.dart';
 
 class ClassState {
@@ -37,8 +37,9 @@ class ClassState {
   }
 }
 
-class ClassNotifier extends StateNotifier<ClassState> {
-  ClassNotifier() : super(const ClassState());
+class ClassNotifier extends Notifier<ClassState> {
+  @override
+  ClassState build() => const ClassState();
 
   void initClass(String studentName, String subject, String time) {
     state = state.copyWith(
@@ -71,6 +72,6 @@ class ClassNotifier extends StateNotifier<ClassState> {
   }
 }
 
-final classProvider = StateNotifierProvider<ClassNotifier, ClassState>(
-  (ref) => ClassNotifier(),
+final classProvider = NotifierProvider<ClassNotifier, ClassState>(
+  ClassNotifier.new,
 );

@@ -1,77 +1,101 @@
-import 'package:flutter/material.dart';
+// lib/provider/teacher_provider.dart
+//
+// ── Purani file completely replace ho gayi ──
+// Ab yahan koi dummy data nahi, sab Firestore realtime streams hain
+// UpcomingClassModel hata diya — TeacherClassModel use hota hai
+// StateNotifier hata diya — StreamProvider use ho raha hai
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+
 import 'package:quran_learning_app/models/teacher/teacher_model.dart';
+import 'package:quran_learning_app/models/teacher_class_model.dart';
 
-// Teacher State
-@immutable
-class TeacherDashboardState {
-  final TeacherModel? teacher;
-  final List<UpcomingClassModel> upcomingClasses;
-  final bool isLoading;
+final _db = FirebaseFirestore.instance;
+String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
-  const TeacherDashboardState({
-    this.teacher,
-    this.upcomingClasses = const [],
-    this.isLoading = false,
-  });
+// ─── Teacher Profile — realtime ───────────────────────────────────────────────
+final teacherProfileProvider = StreamProvider<TeacherModel?>((ref) {
+  if (_uid.isEmpty) return Stream.value(null);
+  return _db
+      .collection('users')
+      .doc(_uid)
+      .snapshots()
+      .map((snap) => snap.exists ? TeacherModelX.fromFirestore(snap) : null);
+});
 
-  TeacherDashboardState copyWith({
-    TeacherModel? teacher,
-    List<UpcomingClassModel>? upcomingClasses,
-    bool? isLoading,
-  }) {
-    return TeacherDashboardState(
-      teacher: teacher ?? this.teacher,
-      upcomingClasses: upcomingClasses ?? this.upcomingClasses,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
-}
+// ─── Upcoming Classes — realtime ──────────────────────────────────────────────
+final upcomingClassesProvider = StreamProvider<List<TeacherClassModel>>((ref) {
+  if (_uid.isEmpty) return Stream.value([]);
+  return _db
+      .collection('classes')
+      .where('teacherId', isEqualTo: _uid)
+      .where('status', whereIn: ['upcoming', 'live'])
+      .orderBy('scheduledAt')
+      .snapshots()
+      .map(
+        (s) => s.docs.map((d) => TeacherClassModelX.fromFirestore(d)).toList(),
+      );
+});
 
-// Notifier
-class TeacherDashboardNotifier extends StateNotifier<TeacherDashboardState> {
-  TeacherDashboardNotifier() : super(const TeacherDashboardState()) {
-    _loadDummyData(); // Baad mein Firebase se replace hoga
-  }
+// ─── Completed Classes — realtime ─────────────────────────────────────────────
+final completedClassesProvider = StreamProvider<List<TeacherClassModel>>((ref) {
+  if (_uid.isEmpty) return Stream.value([]);
+  return _db
+      .collection('classes')
+      .where('teacherId', isEqualTo: _uid)
+      .where('status', isEqualTo: 'completed')
+      .orderBy('scheduledAt', descending: true)
+      .limit(20)
+      .snapshots()
+      .map(
+        (s) => s.docs.map((d) => TeacherClassModelX.fromFirestore(d)).toList(),
+      );
+});
 
-  void _loadDummyData() {
-    // Dummy data — Firebase ke baad yahan se data aayega
-    final teacher = TeacherModel(
-      id: '1',
-      name: 'Ustadh Ahmed',
-      email: 'ahmed@quran.com',
-      experience: '5 Years',
-      languages: ['Arabic', 'English', 'Urdu'],
-      rating: 4.8,
-      totalStudents: 20,
-      todayClasses: 8,
-      monthEarnings: 320,
-    );
+// ─── Dashboard Stats — derived ────────────────────────────────────────────────
+final dashboardStatsProvider = Provider<Map<String, int>>((ref) {
+  final upcoming =
+      ref.watch(upcomingClassesProvider).asData?.value ?? <TeacherClassModel>[];
+  final completed =
+      ref.watch(completedClassesProvider).asData?.value ??
+      <TeacherClassModel>[];
+  final teacher = ref.watch(teacherProfileProvider).asData?.value;
+  final now = DateTime.now();
 
-    final classes = [
-      const UpcomingClassModel(
-        id: '1',
-        studentName: 'Ali Hassan',
-        studentImage: '',
-        time: 'Today, 10:00 AM',
-        subject: 'Tajweed',
-      ),
-      const UpcomingClassModel(
-        id: '2',
-        studentName: 'Fatima Khan',
-        studentImage: '',
-        time: 'Today, 02:00 PM',
-        subject: 'Hifz',
-      ),
-    ];
+  final todayClasses = upcoming.where((c) {
+    final d = c.scheduledAt;
+    return d.year == now.year && d.month == now.month && d.day == now.day;
+  }).length;
 
-    state = state.copyWith(teacher: teacher, upcomingClasses: classes);
-  }
-}
+  return {
+    'totalStudents': teacher?.totalStudents ?? 0,
+    'todayClasses': todayClasses,
+    'upcomingCount': upcoming.length,
+    'completedCount': completed.length,
+  };
+});
 
-// Provider
-final teacherDashboardProvider =
-    StateNotifierProvider<TeacherDashboardNotifier, TeacherDashboardState>(
-      (ref) => TeacherDashboardNotifier(),
-    );
+// ─── Search Query ─────────────────────────────────────────────────────────────
+final searchQueryProvider = StateProvider<String>((_) => '');
+
+// ─── Filtered Upcoming — search applied ──────────────────────────────────────
+final filteredUpcomingProvider = Provider<List<TeacherClassModel>>((ref) {
+  final query = ref.watch(searchQueryProvider).toLowerCase().trim();
+  final list =
+      ref.watch(upcomingClassesProvider).asData?.value ?? <TeacherClassModel>[];
+  if (query.isEmpty) return list;
+  return list
+      .where(
+        (c) =>
+            c.studentName.toLowerCase().contains(query) ||
+            c.subject.toLowerCase().contains(query),
+      )
+      .toList();
+});
+
+// ─── Backward compat — purana provider naam bhi kaam kare ────────────────────
+// Agar koi aur file teacherDashboardProvider use karti ho
+final teacherDashboardProvider = teacherProfileProvider;

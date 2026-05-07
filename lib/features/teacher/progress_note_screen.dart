@@ -161,14 +161,14 @@ class _ProgressNotesScreenState extends ConsumerState<ProgressNotesScreen> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
         ],
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: width * 0.065,
-            backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+            backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
             child: Text(
               widget.studentName[0],
               style: TextStyle(
@@ -234,7 +234,7 @@ class _ProgressNotesScreenState extends ConsumerState<ProgressNotesScreen> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6),
         ],
       ),
       child: TextField(
@@ -317,7 +317,7 @@ class _ProgressNotesScreenState extends ConsumerState<ProgressNotesScreen> {
         color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, -4),
           ),
@@ -374,3 +374,4 @@ class _ProgressNotesScreenState extends ConsumerState<ProgressNotesScreen> {
     );
   }
 }
+

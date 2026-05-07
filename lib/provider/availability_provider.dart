@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:quran_learning_app/models/availabilty/availabilty_model.dart';
 
-// State
+// ─── State ────────────────────────────────────────────────────────────────────
 class AvailabilityState {
   final List<DayAvailabilityModel> days;
   final bool isSaving;
@@ -26,52 +29,50 @@ class AvailabilityState {
   }
 }
 
-// Notifier
+// ─── Notifier ─────────────────────────────────────────────────────────────────
 class AvailabilityNotifier extends StateNotifier<AvailabilityState> {
   AvailabilityNotifier() : super(const AvailabilityState()) {
-    _loadDummyData(); // Firebase ke baad replace hoga
+    _loadDefaultDays();
   }
 
-  void _loadDummyData() {
-    // Dummy data — baad mein Firebase se aayega
+  void _loadDefaultDays() {
     final days = [
       const DayAvailabilityModel(
         day: 'Monday',
-        timeRange: '09:00 AM - 10:00 PM',
+        timeRange: '09:00 AM - 05:00 PM',
         isEnabled: true,
       ),
       const DayAvailabilityModel(
         day: 'Tuesday',
-        timeRange: '09:00 AM - 10:00 PM',
+        timeRange: '09:00 AM - 05:00 PM',
         isEnabled: true,
       ),
       const DayAvailabilityModel(
         day: 'Wednesday',
-        timeRange: '09:00 AM - 10:00 PM',
+        timeRange: '09:00 AM - 05:00 PM',
         isEnabled: true,
       ),
       const DayAvailabilityModel(
         day: 'Thursday',
-        timeRange: '09:00 AM - 10:00 PM',
+        timeRange: '09:00 AM - 05:00 PM',
         isEnabled: true,
       ),
       const DayAvailabilityModel(
         day: 'Friday',
-        timeRange: '02:00 PM - 10:00 PM',
+        timeRange: '02:00 PM - 06:00 PM',
         isEnabled: true,
       ),
       const DayAvailabilityModel(
         day: 'Saturday',
-        timeRange: '10:00 AM - 06:00 PM',
+        timeRange: '10:00 AM - 04:00 PM',
         isEnabled: false,
       ),
       const DayAvailabilityModel(
         day: 'Sunday',
-        timeRange: 'Not Available',
+        timeRange: '10:00 AM - 04:00 PM',
         isEnabled: false,
       ),
     ];
-
     state = state.copyWith(days: days);
   }
 
@@ -91,19 +92,54 @@ class AvailabilityNotifier extends StateNotifier<AvailabilityState> {
     state = state.copyWith(days: updatedDays, isSaved: false);
   }
 
-  // Save availability
-  // Firebase ke baad yahan Firestore call aayegi
+  // Save to Firestore — disabled days ka time save nahi hoga
   Future<void> saveAvailability() async {
     state = state.copyWith(isSaving: true);
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
 
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      final availability = <String, dynamic>{};
+      for (final day in state.days) {
+        if (day.isEnabled) {
+          // Enabled day — time ke saath save karo
+          final parts = day.timeRange.split(' - ');
+          availability[day.day] = {
+            'enabled': true,
+            'startTime': parts.isNotEmpty ? parts[0].trim() : '',
+            'endTime': parts.length > 1 ? parts[1].trim() : '',
+          };
+        } else {
+          // Disabled day — sirf enabled: false, koi time nahi
+          availability[day.day] = {'enabled': false};
+        }
+      }
 
-    state = state.copyWith(isSaving: false, isSaved: true);
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'availability': availability,
+      }, SetOptions(merge: true));
+
+      state = state.copyWith(isSaving: false, isSaved: true);
+    } catch (e) {
+      state = state.copyWith(isSaving: false);
+      rethrow;
+    }
   }
 }
 
-// Provider
+// ─── Providers ────────────────────────────────────────────────────────────────
 final availabilityProvider =
     StateNotifierProvider<AvailabilityNotifier, AvailabilityState>(
       (ref) => AvailabilityNotifier(),
     );
+
+/// Teacher ka poora Firestore document fetch karta hai
+final teacherAvailabilityFutureProvider = FutureProvider<Map<String, dynamic>>((
+  ref,
+) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final doc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .get();
+  return doc.data() ?? {};
+});

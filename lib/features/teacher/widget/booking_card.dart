@@ -27,7 +27,7 @@ class BookingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -41,7 +41,7 @@ class BookingCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: width * 0.06,
-                backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+                backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
                 child: Text(
                   booking.studentName[0],
                   style: TextStyle(
@@ -234,9 +234,9 @@ class _StatusBadge extends StatelessWidget {
         vertical: width * 0.015,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
@@ -249,3 +249,4 @@ class _StatusBadge extends StatelessWidget {
     );
   }
 }
+

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "595149495623",
+    "project_id": "quran-learning-app-b62bc",
+    "storage_bucket": "quran-learning-app-b62bc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595149495623:android:54977176e70f65e1754062",
+        "android_client_info": {
+          "package_name": "com.example.quran_learning_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIfa5rLvslsEJjV3VUmV3yI5tHig8HF9A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
