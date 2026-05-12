@@ -1,4 +1,4 @@
-// lib/models/teacher_class_model.dart
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -19,6 +19,8 @@ abstract class TeacherClassModel with _$TeacherClassModel {
     String? studentReview,
     int? durationMinutes,
     String? meetingLink,
+    String? studentId,
+    String? teacherId,
   }) = _TeacherClassModel;
 
   factory TeacherClassModel.fromJson(Map<String, dynamic> json) =>
@@ -40,6 +42,8 @@ extension TeacherClassModelX on TeacherClassModel {
       studentReview: d['studentReview'],
       durationMinutes: (d['durationMinutes'] as num?)?.toInt(),
       meetingLink: d['meetingLink'],
+      studentId: d['studentId'],
+      teacherId: d['teacherId'],
     );
   }
 
@@ -69,6 +73,8 @@ extension TeacherClassModelX on TeacherClassModel {
       studentReview: d['studentReview'],
       durationMinutes: (d['durationMinutes'] as num?)?.toInt(),
       meetingLink: d['meetingLink'],
+      studentId: d['studentId'],
+      teacherId: d['teacherId'],
     );
   }
 }

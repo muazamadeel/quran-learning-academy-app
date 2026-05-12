@@ -1,18 +1,9 @@
-import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:quran_learning_app/core/navigation/app_router.dart';
+import 'package:quran_learning_app/core/service/class_timer_provider.dart';
 import 'package:quran_learning_app/core/theme/app_theme.dart';
-import 'package:quran_learning_app/models/chat/chat_model.dart';
-import 'package:quran_learning_app/provider/chat_provider.dart';
-import 'package:quran_learning_app/provider/class_provider.dart';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CLASS SCREEN — Teacher's Virtual Classroom
-// ═══════════════════════════════════════════════════════════════════════════
+import 'package:go_router/go_router.dart';
 
 class ClassScreen extends ConsumerStatefulWidget {
   final String studentName;
@@ -31,334 +22,481 @@ class ClassScreen extends ConsumerStatefulWidget {
 }
 
 class _ClassScreenState extends ConsumerState<ClassScreen> {
-  Timer? _timer;
-  int _seconds = 0;
-  final TextEditingController _notesController = TextEditingController();
+  bool _navigatedToEnd = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Parse the time and schedule
+      final now = DateTime.now();
+      final scheduledAt = _parseTime(widget.time, now);
+
       ref
-          .read(classProvider.notifier)
-          .initClass(widget.studentName, widget.subject, widget.time);
+          .read(classTimerProvider.notifier)
+          .start(scheduledAt: scheduledAt, durationMinutes: 30);
     });
-    _startTimer();
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      _seconds++;
-      final h = (_seconds ~/ 3600).toString().padLeft(2, '0');
-      final m = ((_seconds % 3600) ~/ 60).toString().padLeft(2, '0');
-      final s = (_seconds % 60).toString().padLeft(2, '0');
-      ref.read(classProvider.notifier).updateElapsedTime('$h:$m:$s');
-    });
+  DateTime _parseTime(String timeStr, DateTime now) {
+    try {
+      final parts = timeStr.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1].split(' ')[0]);
+
+      var scheduled = DateTime(now.year, now.month, now.day, hour, minute);
+
+      // اگر وقت پہلے نکل گیا تو کل کو set کریں
+      if (scheduled.isBefore(now)) {
+        scheduled = scheduled.add(const Duration(days: 1));
+      }
+
+      return scheduled;
+    } catch (e) {
+      // Default: 30 minutes سے
+      return now.add(const Duration(minutes: 30));
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _notesController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(classProvider);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final timerState = ref.watch(classTimerProvider);
+    final w = MediaQuery.of(context).size.width;
+    final h = MediaQuery.of(context).size.height;
+
+    // Class ختم ہو گیا → progress screen
+    if (timerState.status == ClassStatus.ended && !_navigatedToEnd) {
+      _navigatedToEnd = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.pushReplacement(
+            AppRoutes.progressNotes,
+            extra: {
+              'studentName': widget.studentName,
+              'studentId': 'student_123', // یہ actual student ID سے آنی چاہیے
+              'teacherId': 'teacher_456', // یہ actual teacher ID سے آنی چاہیے
+            },
+          );
+        }
+      });
+    }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF1A1A2E),
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(context, state.elapsedTime, width, height),
-            Expanded(
-              child: Stack(
-                children: [
-                  _buildMainVideo(width, height),
-                  Positioned(
-                    top: height * 0.02,
-                    right: width * 0.04,
-                    child: _buildSmallVideo(state.isVideoOn, width, height),
-                  ),
-                ],
+        child: timerState.status == ClassStatus.waiting
+            ? _WaitingScreen(
+                studentName: widget.studentName,
+                remaining: timerState.remaining,
+                time: widget.time,
+                w: w,
+                h: h,
+              )
+            : _LiveScreen(
+                studentName: widget.studentName,
+                subject: widget.subject,
+                timerState: timerState,
+                w: w,
+                h: h,
+                onEnd: () {
+                  ref.read(classTimerProvider.notifier).endClass();
+                },
               ),
-            ),
-            _buildNotesSection(state.notes, width, height),
-            _buildControls(context, state, width, height),
-          ],
-        ),
       ),
     );
   }
+}
 
-  Widget _buildTopBar(
-    BuildContext context,
-    String elapsedTime,
-    double width,
-    double height,
-  ) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// WAITING SCREEN - 30 منٹ پہلے سے دیکھیں
+// ═══════════════════════════════════════════════════════════════════════════════
+class _WaitingScreen extends StatelessWidget {
+  final String studentName;
+  final Duration remaining;
+  final String time;
+  final double w, h;
+
+  const _WaitingScreen({
+    required this.studentName,
+    required this.remaining,
+    required this.time,
+    required this.w,
+    required this.h,
+  });
+
+  String _formatTime(Duration d) {
+    final hrs = d.inHours;
+    final mins = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final secs = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+
+    if (hrs > 0) return '$hrs:$mins:$secs';
+    return '$mins:$secs';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEarly = remaining.inMinutes > 25; // اگر 25+ منٹ پہلے آئے
+
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: width * 0.04,
-        vertical: height * 0.015,
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
       ),
-      color: Colors.black,
-      child: Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          GestureDetector(
-            onTap: () => context.go(AppRoutes.dashboard),
+          // Timer Icon
+          Container(
+            width: w * 0.35,
+            height: w * 0.35,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primaryGreen.withOpacity(0.15),
+              border: Border.all(color: AppColors.primaryGreen, width: 3),
+            ),
             child: Icon(
-              Icons.arrow_back_ios,
-              color: AppColors.white,
-              size: width * 0.05,
+              Icons.access_time_rounded,
+              color: AppColors.primaryGreen,
+              size: w * 0.16,
             ),
           ),
-          SizedBox(width: width * 0.03),
-          Expanded(
+          SizedBox(height: h * 0.06),
+
+          // Class Info
+          Text(
+            'Class with $studentName',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: w * 0.055,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: h * 0.02),
+          Text(
+            'Scheduled at $time',
+            style: TextStyle(color: Colors.white70, fontSize: w * 0.04),
+          ),
+          SizedBox(height: h * 0.06),
+
+          // Timer Box
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: w * 0.1,
+              vertical: h * 0.03,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: AppColors.primaryGreen.withOpacity(0.5),
+                width: 2,
+              ),
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.studentName,
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: width * 0.04,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                Text(
-                  widget.subject,
+                  'Class starts in',
                   style: TextStyle(
                     color: Colors.white54,
-                    fontSize: width * 0.03,
+                    fontSize: w * 0.038,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                SizedBox(height: h * 0.01),
+                Text(
+                  _formatTime(remaining),
+                  style: TextStyle(
+                    color: AppColors.primaryGreen,
+                    fontSize: w * 0.12,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Courier',
+                    letterSpacing: 2,
                   ),
                 ),
               ],
             ),
           ),
+          SizedBox(height: h * 0.05),
+
+          // Early Join Warning
+          if (isEarly)
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: w * 0.06),
+              padding: EdgeInsets.all(w * 0.04),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.orange.withOpacity(0.4),
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.orange,
+                    size: w * 0.05,
+                  ),
+                  SizedBox(width: w * 0.03),
+                  Expanded(
+                    child: Text(
+                      'You joined early. Class will start at the scheduled time.',
+                      style: TextStyle(
+                        color: Colors.orange.shade200,
+                        fontSize: w * 0.032,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: w * 0.06),
+              padding: EdgeInsets.all(w * 0.04),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.green.withOpacity(0.4),
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.green,
+                    size: w * 0.05,
+                  ),
+                  SizedBox(width: w * 0.03),
+                  Expanded(
+                    child: Text(
+                      'Ready! Class will start automatically when the time comes.',
+                      style: TextStyle(
+                        color: Colors.green.shade200,
+                        fontSize: w * 0.032,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          SizedBox(height: h * 0.06),
+
+          // Back Button
+          TextButton.icon(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back, color: Colors.white54),
+            label: Text(
+              'Go Back',
+              style: TextStyle(color: Colors.white54, fontSize: w * 0.04),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LIVE SCREEN - جب class شروع ہو گئی
+// ═══════════════════════════════════════════════════════════════════════════════
+class _LiveScreen extends StatelessWidget {
+  final String studentName;
+  final String subject;
+  final ClassTimerState timerState;
+  final double w, h;
+  final VoidCallback onEnd;
+
+  const _LiveScreen({
+    required this.studentName,
+    required this.subject,
+    required this.timerState,
+    required this.w,
+    required this.h,
+    required this.onEnd,
+  });
+
+  String _formatTimer(Duration d) {
+    final h = d.inHours.toString().padLeft(2, '0');
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+      child: Column(
+        children: [
+          // Top Bar - Timer & Info
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: width * 0.03,
-              vertical: height * 0.008,
+              horizontal: w * 0.04,
+              vertical: h * 0.015,
             ),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen,
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.black87,
+              border: Border(
+                bottom: BorderSide(
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
             ),
-            child: Text(
-              elapsedTime,
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: width * 0.033,
-                fontWeight: FontWeight.w600,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Student Name
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      studentName,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: w * 0.045,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      subject,
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: w * 0.032,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Timer
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: w * 0.04,
+                    vertical: h * 0.008,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.primaryGreen.withOpacity(0.5),
+                    ),
+                  ),
+                  child: Text(
+                    _formatTimer(timerState.classTimeLeft),
+                    style: TextStyle(
+                      color: AppColors.primaryGreen,
+                      fontSize: w * 0.04,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Courier',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Video/Content Area
+          Expanded(
+            child: Container(
+              color: Colors.black,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: w * 0.4,
+                      height: w * 0.4,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white10,
+                      ),
+                      child: Icon(
+                        Icons.videocam,
+                        color: Colors.white30,
+                        size: w * 0.2,
+                      ),
+                    ),
+                    SizedBox(height: h * 0.03),
+                    Text(
+                      'Agora Video Feed\nWill appear here',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: w * 0.04,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          SizedBox(width: width * 0.02),
-          Icon(
-            Icons.notifications_outlined,
-            color: AppColors.white,
-            size: width * 0.055,
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildMainVideo(double width, double height) {
-    return Container(
-      width: double.infinity,
-      color: const Color(0xFF1A1A2E),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            radius: width * 0.13,
-            backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.3),
-            child: Text(
-              widget.studentName.isNotEmpty ? widget.studentName[0] : '?',
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: width * 0.1,
-                fontWeight: FontWeight.bold,
+          // Bottom Controls
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: w * 0.04,
+              vertical: h * 0.02,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: height * 0.02),
-          Text(
-            widget.studentName,
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: width * 0.045,
-              fontWeight: FontWeight.w600,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Mic
+                _ControlButton(
+                  icon: Icons.mic,
+                  label: 'Mic',
+                  onPress: () {},
+                  w: w,
+                ),
+                // Camera
+                _ControlButton(
+                  icon: Icons.videocam,
+                  label: 'Camera',
+                  onPress: () {},
+                  w: w,
+                ),
+                // Chat
+                _ControlButton(
+                  icon: Icons.chat,
+                  label: 'Chat',
+                  onPress: () {},
+                  w: w,
+                ),
+                // End Call
+                _ControlButton(
+                  icon: Icons.call_end,
+                  label: 'End',
+                  onPress: onEnd,
+                  isEnd: true,
+                  w: w,
+                ),
+              ],
             ),
-          ),
-          SizedBox(height: height * 0.01),
-          Text(
-            'Video Stream',
-            style: TextStyle(color: Colors.white38, fontSize: width * 0.033),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSmallVideo(bool isVideoOn, double width, double height) {
-    return Container(
-      width: width * 0.23,
-      height: height * 0.15,
-      decoration: BoxDecoration(
-        color: isVideoOn
-            ? AppColors.primaryGreen.withValues(alpha: 0.3)
-            : Colors.grey[800],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.white, width: 1.5),
-      ),
-      child: isVideoOn
-          ? Icon(Icons.person, color: AppColors.white, size: width * 0.1)
-          : Icon(Icons.videocam_off, color: Colors.white54, size: width * 0.08),
-    );
-  }
-
-  Widget _buildNotesSection(String notes, double width, double height) {
-    return Container(
-      color: const Color(0xFF1A1A1A),
-      padding: EdgeInsets.symmetric(
-        horizontal: width * 0.04,
-        vertical: height * 0.012,
-      ),
-      child: TextField(
-        controller: _notesController,
-        style: TextStyle(color: AppColors.white, fontSize: width * 0.033),
-        maxLines: 2,
-        onChanged: (val) => ref.read(classProvider.notifier).updateNotes(val),
-        decoration: InputDecoration(
-          hintText: 'Add notes about the class...',
-          hintStyle: TextStyle(color: Colors.white38, fontSize: width * 0.033),
-          filled: true,
-          fillColor: Colors.white10,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: EdgeInsets.all(width * 0.03),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControls(
-    BuildContext context,
-    ClassState state,
-    double width,
-    double height,
-  ) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: width * 0.04,
-        vertical: height * 0.02,
-      ),
-      color: Colors.black,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _ControlButton(
-            icon: state.isMuted ? Icons.mic_off : Icons.mic,
-            label: state.isMuted ? 'Unmute' : 'Mute',
-            isActive: !state.isMuted,
-            width: width,
-            height: height,
-            onTap: () => ref.read(classProvider.notifier).toggleMute(),
-          ),
-          _ControlButton(
-            icon: state.isVideoOn ? Icons.videocam : Icons.videocam_off,
-            label: 'Video',
-            isActive: state.isVideoOn,
-            width: width,
-            height: height,
-            onTap: () => ref.read(classProvider.notifier).toggleVideo(),
-          ),
-          _ControlButton(
-            icon: Icons.screen_share_outlined,
-            label: 'Share',
-            isActive: state.isScreenSharing,
-            width: width,
-            height: height,
-            onTap: () => ref.read(classProvider.notifier).toggleScreenShare(),
-          ),
-          _ControlButton(
-            icon: Icons.chat_bubble_outline,
-            label: 'Chat',
-            isActive: false,
-            width: width,
-            height: height,
-            onTap: () {
-              // Open chat overlay or navigate to chat room
-            },
-          ),
-          _ControlButton(
-            icon: Icons.call_end,
-            label: 'End',
-            isActive: false,
-            isEnd: true,
-            width: width,
-            height: height,
-            onTap: () => _showEndCallDialog(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showEndCallDialog(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'End Class',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: width * 0.042,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to end this class?',
-          style: TextStyle(fontSize: width * 0.035),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: AppColors.textGrey,
-                fontSize: width * 0.035,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.go(
-                AppRoutes.progressNotes,
-                extra: {'studentName': widget.studentName, 'studentId': '1'},
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.rejected,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text('End Class', style: TextStyle(fontSize: width * 0.035)),
           ),
         ],
       ),
@@ -369,395 +507,48 @@ class _ClassScreenState extends ConsumerState<ClassScreen> {
 class _ControlButton extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool isActive;
+  final VoidCallback onPress;
   final bool isEnd;
-  final double width;
-  final double height;
-  final VoidCallback onTap;
+  final double w;
 
   const _ControlButton({
     required this.icon,
     required this.label,
-    required this.isActive,
-    required this.onTap,
-    required this.width,
-    required this.height,
+    required this.onPress,
     this.isEnd = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: width * 0.13,
-            height: width * 0.13,
-            decoration: BoxDecoration(
-              color: isEnd
-                  ? AppColors.rejected
-                  : isActive
-                  ? AppColors.primaryGreen
-                  : Colors.white24,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: AppColors.white, size: width * 0.055),
-          ),
-          SizedBox(height: height * 0.008),
-          Text(
-            label,
-            style: TextStyle(color: Colors.white70, fontSize: width * 0.028),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CHAT ROOM SCREEN — The actual messaging UI
-// ═══════════════════════════════════════════════════════════════════════════
-
-class ChatRoomScreen extends ConsumerStatefulWidget {
-  final String roomId;
-  final String studentName;
-  final String studentImage;
-  final String studentId;
-
-  const ChatRoomScreen({
-    super.key,
-    required this.roomId,
-    required this.studentName,
-    required this.studentImage,
-    required this.studentId,
-  });
-
-  @override
-  ConsumerState<ChatRoomScreen> createState() => _ChatRoomScreenState();
-}
-
-class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
-  final TextEditingController _msgCtrl = TextEditingController();
-  final ScrollController _scrollCtrl = ScrollController();
-  final String _myUid = FirebaseAuth.instance.currentUser!.uid;
-
-  bool _isSending = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(chatActionsProvider.notifier).markMessagesRead(widget.roomId);
-    });
-  }
-
-  @override
-  void dispose() {
-    _msgCtrl.dispose();
-    _scrollCtrl.dispose();
-    super.dispose();
-  }
-
-  void _scrollToBottom() {
-    if (_scrollCtrl.hasClients) {
-      _scrollCtrl.animateTo(
-        _scrollCtrl.position.maxScrollExtent + 100,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
-  }
-
-  Future<void> _send() async {
-    final text = _msgCtrl.text.trim();
-    if (text.isEmpty || _isSending) return;
-
-    setState(() => _isSending = true);
-    _msgCtrl.clear();
-
-    try {
-      await ref
-          .read(chatActionsProvider.notifier)
-          .sendMessage(roomId: widget.roomId, text: text);
-      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to send: $e'),
-            backgroundColor: AppColors.rejected,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSending = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final h = MediaQuery.of(context).size.height;
-    final messagesAsync = ref.watch(messagesProvider(widget.roomId));
-
-    ref.listen(messagesProvider(widget.roomId), (prev, next) {
-      if (next.hasValue) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-      }
-    });
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          _buildHeader(context, w, h),
-          Expanded(
-            child: messagesAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.primaryGreen),
-              ),
-              error: (e, _) => Center(child: Text('Error: $e')),
-              data: (messages) {
-                if (messages.isEmpty) return _buildEmptyChat(w, h);
-                return ListView.builder(
-                  controller: _scrollCtrl,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: w * 0.04,
-                    vertical: h * 0.015,
-                  ),
-                  itemCount: messages.length,
-                  itemBuilder: (_, i) {
-                    final msg = messages[i];
-                    final isMe = msg.senderId == _myUid;
-                    final showDate =
-                        i == 0 ||
-                        !_isSameDay(messages[i - 1].createdAt, msg.createdAt);
-
-                    return Column(
-                      children: [
-                        if (showDate) _buildDateChip(msg.createdAt, w),
-                        _MessageBubble(msg: msg, isMe: isMe, w: w, h: h),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          _buildInputBar(w, h),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, double w, double h) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + h * 0.01,
-        bottom: h * 0.015,
-        left: w * 0.03,
-        right: w * 0.04,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.darkGreen, AppColors.primaryGreen],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
-        ),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          SizedBox(width: w * 0.02),
-          CircleAvatar(
-            radius: w * 0.055,
-            backgroundColor: Colors.white24,
-            backgroundImage: widget.studentImage.isNotEmpty
-                ? NetworkImage(widget.studentImage)
-                : null,
-            child: widget.studentImage.isEmpty
-                ? Text(
-                    widget.studentName.isNotEmpty
-                        ? widget.studentName[0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : null,
-          ),
-          SizedBox(width: w * 0.03),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.studentName,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: w * 0.042,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  'Student',
-                  style: TextStyle(color: Colors.white70, fontSize: w * 0.028),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyChat(double w, double h) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.waving_hand_rounded,
-            size: w * 0.1,
-            color: AppColors.primaryGreen.withValues(alpha: 0.3),
-          ),
-          SizedBox(height: h * 0.01),
-          Text(
-            'Say Assalam u Alaikum! 👋',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textDark,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateChip(DateTime? date, double w) {
-    if (date == null) return const SizedBox.shrink();
-    final label = _isToday(date)
-        ? 'Today'
-        : _isYesterday(date)
-        ? 'Yesterday'
-        : DateFormat('MMM d, yyyy').format(date);
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: w * 0.02),
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.primaryGreen.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: w * 0.028,
-              color: AppColors.primaryGreen,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInputBar(double w, double h) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        w * 0.04,
-        h * 0.01,
-        w * 0.04,
-        MediaQuery.of(context).padding.bottom + h * 0.01,
-      ),
-      color: Colors.white,
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _msgCtrl,
-              decoration: InputDecoration(
-                hintText: 'Type a message...',
-                filled: true,
-                fillColor: AppColors.background,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: w * 0.02),
-          IconButton(
-            icon: Icon(Icons.send_rounded, color: AppColors.primaryGreen),
-            onPressed: _send,
-          ),
-        ],
-      ),
-    );
-  }
-
-  bool _isSameDay(DateTime? a, DateTime? b) =>
-      a?.year == b?.year && a?.month == b?.month && a?.day == b?.day;
-  bool _isToday(DateTime d) => _isSameDay(d, DateTime.now());
-  bool _isYesterday(DateTime d) =>
-      _isSameDay(d, DateTime.now().subtract(const Duration(days: 1)));
-}
-
-class _MessageBubble extends StatelessWidget {
-  final MessageModel msg;
-  final bool isMe;
-  final double w, h;
-
-  const _MessageBubble({
-    required this.msg,
-    required this.isMe,
     required this.w,
-    required this.h,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.only(bottom: h * 0.01),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: isMe ? AppColors.primaryGreen : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              msg.text,
-              style: TextStyle(color: isMe ? Colors.white : AppColors.textDark),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: onPress,
+          child: Container(
+            width: w * 0.12,
+            height: w * 0.12,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isEnd ? Colors.red.withOpacity(0.8) : Colors.white10,
+              border: Border.all(
+                color: isEnd ? Colors.red : Colors.white.withOpacity(0.3),
+              ),
             ),
-
-            Text(DateFormat('hh:mm a').format(msg.createdAt ?? DateTime.now())),
-          ],
+            child: Icon(
+              icon,
+              color: isEnd ? Colors.white : Colors.white70,
+              size: w * 0.06,
+            ),
+          ),
         ),
-      ),
+        SizedBox(height: w * 0.01),
+        Text(
+          label,
+          style: TextStyle(color: Colors.white60, fontSize: w * 0.03),
+        ),
+      ],
     );
   }
 }

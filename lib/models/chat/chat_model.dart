@@ -27,20 +27,32 @@ class ChatUser {
     this.lastMessageAt,
   });
 
-  factory ChatUser.fromFirestore(DocumentSnapshot doc) {
+  factory ChatUser.fromFirestore(DocumentSnapshot doc, String currentUid) {
     final d = doc.data() as Map<String, dynamic>;
     final ts = d['lastMessageAt'] as Timestamp?;
     final dt = ts?.toDate();
 
+    final isTeacher = d['teacherId'] == currentUid;
+
     return ChatUser(
       id: doc.id,
-      userId: d['studentId'] as String? ?? '',
-      name: d['studentName'] as String? ?? '',
-      role: 'student',
-      avatarUrl: d['studentImage'] as String? ?? '',
+      userId: isTeacher
+          ? (d['studentId'] as String? ?? '')
+          : (d['teacherId'] as String? ?? ''),
+      name: isTeacher
+          ? (d['studentName'] as String? ?? '')
+          : (d['teacherName'] as String? ?? ''),
+      role: isTeacher ? 'student' : 'teacher',
+      avatarUrl: isTeacher
+          ? (d['studentImage'] as String? ?? '')
+          : (d['teacherImage'] as String? ?? ''),
       lastMessage: d['lastMessage'] as String? ?? '',
       time: dt != null ? _formatTime(dt) : '',
-      unreadCount: d['unreadCount'] as int? ?? 0,
+      unreadCount: (d['lastMessageSenderId'] == currentUid)
+          ? 0
+          : (isTeacher
+              ? ((d['unreadForTeacher'] as num?)?.toInt() ?? 0)
+              : ((d['unreadForStudent'] as num?)?.toInt() ?? 0)),
       lastMessageAt: dt,
     );
   }

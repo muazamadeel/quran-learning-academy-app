@@ -1,18 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quran_learning_app/core/service/notification_service.dart';
+import 'package:quran_learning_app/core/utils/timezone_helper.dart';
 import 'package:quran_learning_app/models/student/student_model.dart';
+import 'package:quran_learning_app/provider/chat_provider.dart';
 
 class StudentBookingState {
   final TeacherListModel? selectedTeacher;
   final String? selectedDate;
-  final String? selectedDay; // Monday, Tuesday, etc.
+  final String? selectedDay;
   final SlotModel? selectedSlot;
   final List<SlotModel> availableSlots;
   final List<String> availableDates;
   final bool isBooking;
   final bool isBooked;
   final bool isLoadingSlots;
+
+  // ── Timezone info ──────────────────────────────────────────────────────────
+  final String studentTimezone;
+  final String teacherTimezone;
+  final String studentName;
+  final String studentImage;
 
   const StudentBookingState({
     this.selectedTeacher,
@@ -24,6 +33,10 @@ class StudentBookingState {
     this.isBooking = false,
     this.isBooked = false,
     this.isLoadingSlots = false,
+    this.studentTimezone = '',
+    this.teacherTimezone = '',
+    this.studentName = '',
+    this.studentImage = '',
   });
 
   StudentBookingState copyWith({
@@ -37,6 +50,10 @@ class StudentBookingState {
     bool? isBooked,
     bool? isLoadingSlots,
     bool clearSlot = false,
+    String? studentTimezone,
+    String? teacherTimezone,
+    String? studentName,
+    String? studentImage,
   }) {
     return StudentBookingState(
       selectedTeacher: selectedTeacher ?? this.selectedTeacher,
@@ -48,6 +65,10 @@ class StudentBookingState {
       isBooking: isBooking ?? this.isBooking,
       isBooked: isBooked ?? this.isBooked,
       isLoadingSlots: isLoadingSlots ?? this.isLoadingSlots,
+      studentTimezone: studentTimezone ?? this.studentTimezone,
+      teacherTimezone: teacherTimezone ?? this.teacherTimezone,
+      studentName: studentName ?? this.studentName,
+      studentImage: studentImage ?? this.studentImage,
     );
   }
 
@@ -59,20 +80,35 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
   final _db = FirebaseFirestore.instance;
 
   @override
-  StudentBookingState build() {
-    return const StudentBookingState();
-  }
+  StudentBookingState build() => const StudentBookingState();
 
-  void initWithTeacher(TeacherListModel teacher) {
-    // Generate next 7 days that the teacher is available
+  // ── Init ───────────────────────────────────────────────────────────────────
+  // Teacher select hone par: student ka timezone fetch karo, dates generate karo
+  Future<void> initWithTeacher(TeacherListModel teacher) async {
+    // Student ka timezone Firestore se fetch karo
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    String studentTz = '';
+    String studentName = '';
+    String studentImg = '';
+    String teacherTz = teacher.timezone;
+
+    if (uid.isNotEmpty) {
+      try {
+        final doc = await _db.collection('users').doc(uid).get();
+        final d = doc.data();
+        studentTz = d?['timezone'] as String? ?? '';
+        studentName = d?['name'] as String? ?? '';
+        studentImg = d?['profileImage'] as String? ?? '';
+      } catch (_) {}
+    }
+
+    // Next 7 available dates generate karo
     final dates = <String>[];
     final now = DateTime.now();
 
     for (int i = 0; i < 14; i++) {
       final date = now.add(Duration(days: i));
       final dayName = _getDayName(date.weekday);
-
-      // Check if teacher is available on this day
       final dayAvail = teacher.availability[dayName];
       if (dayAvail != null && dayAvail['enabled'] == true) {
         dates.add(_formatDate(date));
@@ -84,33 +120,30 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
       selectedTeacher: teacher,
       availableDates: dates,
       selectedDate: dates.isNotEmpty ? dates.first : null,
-      selectedDay: dates.isNotEmpty
-          ? _getDayName(now.add(Duration(days: 0)).weekday)
-          : null,
+      selectedDay: dates.isNotEmpty ? _getDayName(now.weekday) : null,
+      studentTimezone: studentTz,
+      teacherTimezone: teacherTz,
+      studentName: studentName,
+      studentImage: studentImg,
     );
 
     if (dates.isNotEmpty) {
-      _loadSlotsForDate(dates.first, teacher);
+      await _loadSlotsForDate(dates.first, teacher);
     }
   }
 
   void selectDate(String date) {
     final teacher = state.selectedTeacher;
     if (teacher == null) return;
-
     state = state.copyWith(selectedDate: date, clearSlot: true);
     _loadSlotsForDate(date, teacher);
   }
 
-  /// Parse teacher's start/end time and generate 30-minute slots,
-  /// then check Firestore for already-booked slots
-  Future<void> _loadSlotsForDate(
-    String date,
-    TeacherListModel teacher,
-  ) async {
+  // ── Load slots ─────────────────────────────────────────────────────────────
+  // Teacher ke times generate karo, phir student ke timezone mein convert karo
+  Future<void> _loadSlotsForDate(String date, TeacherListModel teacher) async {
     state = state.copyWith(isLoadingSlots: true);
 
-    // Determine which day of the week this date is
     final parsedDate = _parseDate(date);
     if (parsedDate == null) {
       state = state.copyWith(isLoadingSlots: false);
@@ -129,7 +162,7 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
       return;
     }
 
-    // Parse start and end times
+    // Teacher ka start/end time (teacher ke timezone mein)
     final startTime = _parseTime(dayAvail['startTime'] ?? '9:00 AM');
     final endTime = _parseTime(dayAvail['endTime'] ?? '5:00 PM');
 
@@ -138,27 +171,37 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
       return;
     }
 
-    // Generate 30-minute slots
+    // 30-minute slots generate karo (teacher ke timezone mein)
     final slots = <SlotModel>[];
     var current = startTime;
     int slotIndex = 0;
 
     while (_timeToMinutes(current) + 30 <= _timeToMinutes(endTime)) {
       final endSlot = _addMinutes(current, 30);
-      final timeStr = '${_fmtTime(current)} - ${_fmtTime(endSlot)}';
 
-      slots.add(SlotModel(
-        id: 'slot_$slotIndex',
-        time: timeStr,
-        isAvailable: true,
-        isSelected: false,
-      ));
+      // Teacher ke timezone mein original time (Firestore save ke liye)
+      final teacherTimeStr = '${_fmtTime(current)} - ${_fmtTime(endSlot)}';
+
+      // ── Timezone conversion ──────────────────────────────────────────────
+      // Student ko apne timezone mein dikhao
+      final displayTime = _convertSlotTime(teacherTimeStr);
+
+      slots.add(
+        SlotModel(
+          id: 'slot_$slotIndex',
+          time: displayTime, // Student ko dikhne wala time
+          teacherTime:
+              teacherTimeStr, // Firestore mein save hone wala teacher time
+          isAvailable: true,
+          isSelected: false,
+        ),
+      );
 
       current = endSlot;
       slotIndex++;
     }
 
-    // Check which slots are already booked in Firestore
+    // Firestore se already booked slots check karo
     try {
       final dateStr = _dateToString(parsedDate);
       final bookedSnap = await _db
@@ -172,9 +215,9 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
           .whereType<String>()
           .toSet();
 
-      // Mark booked slots as unavailable
+      // bookedTimes mein teacher ka time hoga — match teacher time se karo
       final updatedSlots = slots.map((slot) {
-        if (bookedTimes.contains(slot.time)) {
+        if (bookedTimes.contains(slot.teacherTime)) {
           return slot.copyWith(isAvailable: false);
         }
         return slot;
@@ -194,6 +237,23 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
     }
   }
 
+  /// Teacher time → Student time convert karta hai
+  /// Agar koi timezone nahi mila to original time return karta hai
+  String _convertSlotTime(String teacherTimeStr) {
+    final teacherTz = state.teacherTimezone;
+    final studentTz = state.studentTimezone;
+
+    if (teacherTz.isEmpty || studentTz.isEmpty || teacherTz == studentTz) {
+      return teacherTimeStr;
+    }
+
+    return TimezoneHelper.convertTime(
+      timeStr: teacherTimeStr,
+      fromTz: teacherTz,
+      toTz: studentTz,
+    );
+  }
+
   void selectSlot(SlotModel slot) {
     if (!slot.isAvailable) return;
     final updated = state.availableSlots.map((s) {
@@ -202,32 +262,81 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
     state = state.copyWith(availableSlots: updated, selectedSlot: slot);
   }
 
-  /// Book the slot — save to Firestore
+  // ── Confirm booking ────────────────────────────────────────────────────────
+  // Firestore mein teacher ka original time save karo (student ka converted nahi)
   Future<void> confirmBooking() async {
     if (!state.canBook) return;
+    final teacher = state.selectedTeacher!;
     state = state.copyWith(isBooking: true);
 
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
-      final user = FirebaseAuth.instance.currentUser!;
-      final parsedDate = _parseDate(state.selectedDate!);
-      final dateStr = parsedDate != null ? _dateToString(parsedDate) : state.selectedDate!;
 
-      await _db.collection('bookings').add({
+      // ── Create Chat Room ───────────────────────────────────────────────
+      await ref
+          .read(chatActionsProvider.notifier)
+          .createOrGetRoom(
+            teacherId: teacher.id,
+            teacherName: teacher.name,
+            teacherImage: teacher.profileImage, // Ensure this exists in model
+            studentId: uid,
+            studentName: state.studentName,
+            studentImage: state.studentImage,
+          );
+
+      final parsedDate = _parseDate(state.selectedDate!);
+      final dateStr = parsedDate != null
+          ? _dateToString(parsedDate)
+          : state.selectedDate!;
+
+      // Teacher ka original time save karo (not converted)
+      final teacherTime = state.selectedSlot!.teacherTime.isNotEmpty
+          ? state.selectedSlot!.teacherTime
+          : state.selectedSlot!.time;
+
+      // Calculate actual scheduled DateTime
+      final slotStartTime = state.selectedSlot!.time.split(' - ')[0];
+      final slotTimeParts = _parseTime(slotStartTime);
+      DateTime? scheduledDateTime;
+      if (parsedDate != null && slotTimeParts != null) {
+        scheduledDateTime = DateTime(
+          parsedDate.year,
+          parsedDate.month,
+          parsedDate.day,
+          slotTimeParts['hour']!,
+          slotTimeParts['minute']!,
+        );
+      }
+
+      final bookingRef = await _db.collection('bookings').add({
         'studentId': uid,
-        'studentName': user.displayName ?? '',
-        'teacherId': state.selectedTeacher!.id,
-        'teacherName': state.selectedTeacher!.name,
+        'studentName': state.studentName,
+        'teacherId': teacher.id,
+        'teacherName': teacher.name,
+        'participants': [uid, teacher.id],
         'date': dateStr,
-        'slotTime': state.selectedSlot!.time,
+        'slotTime': teacherTime,
+        'studentSlotTime': state.selectedSlot!.time,
         'day': state.selectedDay ?? '',
-        'subject': 'Quran',
         'status': 'confirmed',
-        'dateTime': FieldValue.serverTimestamp(),
+        'teacherTimezone': state.teacherTimezone,
+        'studentTimezone': state.studentTimezone,
+        'dateTime': scheduledDateTime != null
+            ? Timestamp.fromDate(scheduledDateTime)
+            : FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // Reload slots to show the booked slot as unavailable
+      // ── Schedule Notification ──────────────────────────────────────────
+      if (scheduledDateTime != null) {
+        await NotificationService.scheduleClassReminder(
+          notificationId: bookingRef.id.hashCode,
+          channelName: teacher.name,
+          classTime: scheduledDateTime,
+          isTeacher: false,
+        );
+      }
+
       if (state.selectedTeacher != null && state.selectedDate != null) {
         await _loadSlotsForDate(state.selectedDate!, state.selectedTeacher!);
       }
@@ -238,11 +347,9 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
     }
   }
 
-  void reset() {
-    state = const StudentBookingState();
-  }
+  void reset() => state = const StudentBookingState();
 
-  // ── Helpers ─────────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
   String _getDayName(int weekday) {
     const days = [
@@ -259,8 +366,18 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
 
   String _formatDate(DateTime dt) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final now = DateTime.now();
@@ -278,24 +395,30 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
   }
 
   DateTime? _parseDate(String dateStr) {
-    // Parse "Today, 6 May" or "Mon, 7 May" format
     final now = DateTime.now();
     try {
       final parts = dateStr.split(', ');
       if (parts.length < 2) return null;
-
-      final datePart = parts[1]; // "6 May"
+      final datePart = parts[1];
       final dayMonth = datePart.split(' ');
       if (dayMonth.length < 2) return null;
-
       final day = int.parse(dayMonth[0]);
       const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       final month = months.indexOf(dayMonth[1]) + 1;
       if (month == 0) return null;
-
       return DateTime(now.year, month, day);
     } catch (_) {
       return null;
@@ -307,29 +430,24 @@ class StudentBookingNotifier extends Notifier<StudentBookingState> {
   }
 
   Map<String, int>? _parseTime(String timeStr) {
-    // Parse "9:00 AM" or "5:00 PM"
     try {
       final clean = timeStr.trim();
       final parts = clean.split(' ');
       if (parts.length < 2) return null;
-
       final timeParts = parts[0].split(':');
       var hour = int.parse(timeParts[0]);
       final minute = int.parse(timeParts[1]);
       final period = parts[1].toUpperCase();
-
       if (period == 'PM' && hour != 12) hour += 12;
       if (period == 'AM' && hour == 12) hour = 0;
-
       return {'hour': hour, 'minute': minute};
     } catch (_) {
       return null;
     }
   }
 
-  int _timeToMinutes(Map<String, int> time) {
-    return time['hour']! * 60 + time['minute']!;
-  }
+  int _timeToMinutes(Map<String, int> time) =>
+      time['hour']! * 60 + time['minute']!;
 
   Map<String, int> _addMinutes(Map<String, int> time, int minutes) {
     final total = _timeToMinutes(time) + minutes;

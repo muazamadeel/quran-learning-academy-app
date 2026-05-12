@@ -51,10 +51,7 @@ class TeacherCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [
-                      AppColors.primaryGreen,
-                      AppColors.gold,
-                    ],
+                    colors: [AppColors.primaryGreen, AppColors.gold],
                   ),
                 ),
                 child: CircleAvatar(
@@ -62,8 +59,9 @@ class TeacherCard extends StatelessWidget {
                   backgroundColor: AppColors.white,
                   child: CircleAvatar(
                     radius: width * 0.065,
-                    backgroundColor:
-                        AppColors.primaryGreen.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.primaryGreen.withValues(
+                      alpha: 0.1,
+                    ),
                     child: Text(
                       teacher.name.isNotEmpty ? teacher.name[0] : '?',
                       style: TextStyle(
@@ -139,8 +137,11 @@ class TeacherCard extends StatelessWidget {
                     Row(
                       children: [
                         if (teacher.country.isNotEmpty) ...[
-                          Icon(Icons.location_on_outlined,
-                              size: width * 0.032, color: AppColors.textGrey),
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: width * 0.032,
+                            color: AppColors.textGrey,
+                          ),
                           SizedBox(width: width * 0.005),
                           Text(
                             teacher.country,
@@ -152,8 +153,11 @@ class TeacherCard extends StatelessWidget {
                           SizedBox(width: width * 0.02),
                         ],
                         if (teacher.experience.isNotEmpty) ...[
-                          Icon(Icons.work_outline,
-                              size: width * 0.03, color: AppColors.textGrey),
+                          Icon(
+                            Icons.work_outline,
+                            size: width * 0.03,
+                            color: AppColors.textGrey,
+                          ),
                           SizedBox(width: width * 0.005),
                           Text(
                             teacher.experience,
@@ -185,33 +189,33 @@ class TeacherCard extends StatelessWidget {
           SizedBox(height: height * 0.012),
 
           // ── Subjects ────────────────────────────────────────────
-          if (teacher.subjects.isNotEmpty) ...[
-            Wrap(
-              spacing: width * 0.02,
-              runSpacing: width * 0.015,
-              children: teacher.subjects.map((subject) {
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.03,
-                    vertical: width * 0.012,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    subject,
-                    style: TextStyle(
-                      fontSize: width * 0.028,
-                      color: AppColors.primaryGreen,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: height * 0.012),
-          ],
+          // if (teacher.subjects.isNotEmpty) ...[
+          //   Wrap(
+          //     spacing: width * 0.02,
+          //     runSpacing: width * 0.015,
+          //     children: teacher.subjects.map((subject) {
+          //       return Container(
+          //         padding: EdgeInsets.symmetric(
+          //           horizontal: width * 0.03,
+          //           vertical: width * 0.012,
+          //         ),
+          //         decoration: BoxDecoration(
+          //           color: AppColors.primaryGreen.withValues(alpha: 0.08),
+          //           borderRadius: BorderRadius.circular(8),
+          //         ),
+          //         child: Text(
+          //           subject,
+          //           style: TextStyle(
+          //             fontSize: width * 0.028,
+          //             color: AppColors.primaryGreen,
+          //             fontWeight: FontWeight.w500,
+          //           ),
+          //         ),
+          //       );
+          //     }).toList(),
+          //   ),
+          // SizedBox(height: height * 0.012),
+          // ],
 
           // ── Schedule info ───────────────────────────────────────
           if (availableDays.isNotEmpty)
@@ -240,32 +244,34 @@ class TeacherCard extends StatelessWidget {
                   Expanded(
                     child: Wrap(
                       spacing: width * 0.012,
-                      children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-                          .map((d) {
-                        final isActive = availableDays.contains(d);
-                        return Container(
-                          width: width * 0.075,
-                          padding: EdgeInsets.symmetric(vertical: 3),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? AppColors.primaryGreen
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Center(
-                            child: Text(
-                              d,
-                              style: TextStyle(
-                                fontSize: width * 0.022,
-                                fontWeight: FontWeight.w700,
-                                color: isActive
-                                    ? AppColors.white
-                                    : AppColors.textLight,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
+                            (d) {
+                              final isActive = availableDays.contains(d);
+                              return Container(
+                                width: width * 0.075,
+                                padding: EdgeInsets.symmetric(vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: isActive
+                                      ? AppColors.primaryGreen
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    d,
+                                    style: TextStyle(
+                                      fontSize: width * 0.022,
+                                      fontWeight: FontWeight.w700,
+                                      color: isActive
+                                          ? AppColors.white
+                                          : AppColors.textLight,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ).toList(),
                     ),
                   ),
                 ],
@@ -337,4 +343,3 @@ class TeacherCard extends StatelessWidget {
     );
   }
 }
-

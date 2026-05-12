@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quran_learning_app/core/navigation/app_router.dart';
 import 'package:quran_learning_app/core/theme/app_theme.dart';
 import 'package:quran_learning_app/models/student/student_model.dart';
-import 'package:quran_learning_app/provider/student/subscription_provider.dart';
+import 'package:quran_learning_app/provider/student/subscriptionprovider.dart';
 
 class SubscriptionScreen extends ConsumerWidget {
   const SubscriptionScreen({super.key});
@@ -264,7 +264,10 @@ class SubscriptionScreen extends ConsumerWidget {
               ],
             ),
             SizedBox(height: height * 0.012),
-            Divider(height: 1, color: AppColors.textLight.withValues(alpha: 0.5)),
+            Divider(
+              height: 1,
+              color: AppColors.textLight.withValues(alpha: 0.5),
+            ),
             SizedBox(height: height * 0.012),
             ...plan.features.map(
               (feature) => Padding(
@@ -440,4 +443,3 @@ class SubscriptionScreen extends ConsumerWidget {
     );
   }
 }
-

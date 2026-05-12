@@ -32,7 +32,6 @@ abstract class TeacherListModel with _$TeacherListModel {
     required int totalStudents,
     @Default('') String profileImage,
     @Default(true) bool isAvailable,
-    @Default([]) List<String> subjects,
     @Default('') String country,
     @Default('') String timezone,
     @Default(<String, dynamic>{}) Map<String, dynamic> availability,
@@ -50,8 +49,12 @@ abstract class StudentUpcomingClassModel with _$StudentUpcomingClassModel {
     required String teacherImage,
     required String time,
     required String date,
-    required String subject,
+
     @Default('upcoming') String status,
+    String? teacherId,
+    String? studentId,
+    DateTime? scheduledAt,
+    int? durationMinutes,
   }) = _StudentUpcomingClassModel;
 
   factory StudentUpcomingClassModel.fromJson(Map<String, dynamic> json) =>
@@ -63,7 +66,6 @@ abstract class StudentProgressModel with _$StudentProgressModel {
   const factory StudentProgressModel({
     required String id,
     required String teacherName,
-    required String subject,
     required String date,
     required String progressNote,
     required String whatWasCovered,
@@ -95,7 +97,9 @@ abstract class SubscriptionPlanModel with _$SubscriptionPlanModel {
 abstract class SlotModel with _$SlotModel {
   const factory SlotModel({
     required String id,
-    required String time,
+    required String time, // Student ke timezone mein display time
+    @Default('')
+    String teacherTime, // Teacher ka original time (Firestore ke liye)
     @Default(false) bool isSelected,
     @Default(true) bool isAvailable,
   }) = _SlotModel;

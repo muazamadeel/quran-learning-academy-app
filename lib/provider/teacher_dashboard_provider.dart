@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:quran_learning_app/models/teacher/teacher_model.dart';
 import 'package:quran_learning_app/models/teacher_class_model.dart';
 import 'package:quran_learning_app/provider/auth/auth_provider.dart';
+import 'package:quran_learning_app/core/service/notification_service.dart';
 
 final _db = FirebaseFirestore.instance;
 
@@ -45,7 +46,7 @@ final upcomingClassesProvider = Provider<List<TeacherClassModel>>((ref) {
       .where(
         (c) =>
             c.status == 'confirmed' &&
-            c.scheduledAt.isAfter(now.subtract(const Duration(hours: 1))),
+            c.scheduledAt.isAfter(now.subtract(const Duration(minutes: 30))),
       )
       .toList();
 });
@@ -69,7 +70,7 @@ final dashboardStatsProvider = Provider<Map<String, int>>((ref) {
       .where(
         (c) =>
             c.status == 'confirmed' &&
-            c.scheduledAt.isAfter(now.subtract(const Duration(hours: 1))),
+            c.scheduledAt.isAfter(now.subtract(const Duration(minutes: 30))),
       )
       .toList();
 
@@ -107,4 +108,17 @@ final filteredUpcomingProvider = Provider<List<TeacherClassModel>>((ref) {
             c.subject.toLowerCase().contains(query),
       )
       .toList();
+});
+// ─── Notification Scheduler (Teacher) ──────────────────────────────────────────
+final teacherNotificationScheduler = Provider<void>((ref) {
+  final upcoming = ref.watch(upcomingClassesProvider);
+
+  for (final cls in upcoming) {
+    NotificationService.scheduleClassReminder(
+      notificationId: cls.id.hashCode,
+      channelName: cls.studentName,
+      classTime: cls.scheduledAt,
+      isTeacher: true,
+    );
+  }
 });

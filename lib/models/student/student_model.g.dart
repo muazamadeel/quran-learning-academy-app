@@ -45,11 +45,6 @@ _TeacherListModel _$TeacherListModelFromJson(Map<String, dynamic> json) =>
       totalStudents: (json['totalStudents'] as num).toInt(),
       profileImage: json['profileImage'] as String? ?? '',
       isAvailable: json['isAvailable'] as bool? ?? true,
-      subjects:
-          (json['subjects'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
       country: json['country'] as String? ?? '',
       timezone: json['timezone'] as String? ?? '',
       availability:
@@ -67,7 +62,6 @@ Map<String, dynamic> _$TeacherListModelToJson(_TeacherListModel instance) =>
       'totalStudents': instance.totalStudents,
       'profileImage': instance.profileImage,
       'isAvailable': instance.isAvailable,
-      'subjects': instance.subjects,
       'country': instance.country,
       'timezone': instance.timezone,
       'availability': instance.availability,
@@ -81,8 +75,13 @@ _StudentUpcomingClassModel _$StudentUpcomingClassModelFromJson(
   teacherImage: json['teacherImage'] as String,
   time: json['time'] as String,
   date: json['date'] as String,
-  subject: json['subject'] as String,
   status: json['status'] as String? ?? 'upcoming',
+  teacherId: json['teacherId'] as String?,
+  studentId: json['studentId'] as String?,
+  scheduledAt: json['scheduledAt'] == null
+      ? null
+      : DateTime.parse(json['scheduledAt'] as String),
+  durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$StudentUpcomingClassModelToJson(
@@ -93,8 +92,11 @@ Map<String, dynamic> _$StudentUpcomingClassModelToJson(
   'teacherImage': instance.teacherImage,
   'time': instance.time,
   'date': instance.date,
-  'subject': instance.subject,
   'status': instance.status,
+  'teacherId': instance.teacherId,
+  'studentId': instance.studentId,
+  'scheduledAt': instance.scheduledAt?.toIso8601String(),
+  'durationMinutes': instance.durationMinutes,
 };
 
 _StudentProgressModel _$StudentProgressModelFromJson(
@@ -102,7 +104,6 @@ _StudentProgressModel _$StudentProgressModelFromJson(
 ) => _StudentProgressModel(
   id: json['id'] as String,
   teacherName: json['teacherName'] as String,
-  subject: json['subject'] as String,
   date: json['date'] as String,
   progressNote: json['progressNote'] as String,
   whatWasCovered: json['whatWasCovered'] as String,
@@ -115,7 +116,6 @@ Map<String, dynamic> _$StudentProgressModelToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'teacherName': instance.teacherName,
-  'subject': instance.subject,
   'date': instance.date,
   'progressNote': instance.progressNote,
   'whatWasCovered': instance.whatWasCovered,
@@ -152,6 +152,7 @@ Map<String, dynamic> _$SubscriptionPlanModelToJson(
 _SlotModel _$SlotModelFromJson(Map<String, dynamic> json) => _SlotModel(
   id: json['id'] as String,
   time: json['time'] as String,
+  teacherTime: json['teacherTime'] as String? ?? '',
   isSelected: json['isSelected'] as bool? ?? false,
   isAvailable: json['isAvailable'] as bool? ?? true,
 );
@@ -160,6 +161,7 @@ Map<String, dynamic> _$SlotModelToJson(_SlotModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time,
+      'teacherTime': instance.teacherTime,
       'isSelected': instance.isSelected,
       'isAvailable': instance.isAvailable,
     };

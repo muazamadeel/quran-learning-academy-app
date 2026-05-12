@@ -1,192 +1,6 @@
-// import 'package:go_router/go_router.dart';
-// import 'package:quran_learning_app/features/auth/login_screen.dart';
-// import 'package:quran_learning_app/features/auth/signup_screen.dart';
-// import 'package:quran_learning_app/features/auth/teacher_availability_screen.dart';
-// import 'package:quran_learning_app/features/auth/approval_pending_screen.dart';
-// import 'package:quran_learning_app/features/update_availabilty_screen.dart';
-// import 'package:quran_learning_app/features/splash_screen.dart';
-// import 'package:quran_learning_app/features/teacher/dashboard_screen.dart';
-// import 'package:quran_learning_app/features/teacher/booking_screen.dart';
-// import 'package:quran_learning_app/features/teacher/class_screen.dart';
-// import 'package:quran_learning_app/features/teacher/progress_note_screen.dart';
-// import 'package:quran_learning_app/features/teacher/student_dashboard_screen.dart';
-// import 'package:quran_learning_app/features/teacher/widget/teacher_list_screen.dart';
-// import 'package:quran_learning_app/features/teacher/student_booking_screen.dart';
-// import 'package:quran_learning_app/models/student/student_model.dart';
-// import 'package:quran_learning_app/features/teacher/widget/schedule_screen.dart';
-// import 'package:quran_learning_app/features/teacher/widget/student_progress.dart';
-// import 'package:quran_learning_app/features/teacher/widget/subscription_screen.dart';
-// import 'package:quran_learning_app/features/teacher/student_class_screen.dart';
-// import 'package:quran_learning_app/features/teacher/chat_list_screen.dart';
-
-// class AppRouter {
-//   static final router = GoRouter(
-//     initialLocation: AppRoutes.splash,
-//     routes: [
-//       // ── Auth ────────────────────────────────────────────────────────────
-//       GoRoute(
-//         path: AppRoutes.splash,
-//         builder: (context, state) => const SplashScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.login,
-//         builder: (context, state) => const LoginScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.signup,
-//         builder: (context, state) => const SignupScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.teacherAvailability,
-//         builder: (context, state) => const TeacherAvailabilityScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.approvalPending,
-//         builder: (context, state) => const ApprovalPendingScreen(),
-//       ),
-
-//       // ── Teacher Routes ───────────────────────────────────────────────────
-//       GoRoute(
-//         path: AppRoutes.dashboard,
-//         name: AppRoutes.dashboard,
-//         builder: (context, state) => const DashboardScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.availability,
-//         name: AppRoutes.availability,
-//         builder: (context, state) => const UpdateAvailabilityScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.bookings,
-//         name: AppRoutes.bookings,
-//         builder: (context, state) => const BookingsScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.classroom,
-//         name: AppRoutes.classroom,
-//         builder: (context, state) {
-//           final extra = state.extra as Map<String, dynamic>;
-//           return ClassScreen(
-//             studentName: extra['studentName'] as String,
-//             subject: extra['subject'] as String,
-//             time: extra['time'] as String,
-//           );
-//         },
-//       ),
-//       GoRoute(
-//         path: AppRoutes.progressNotes,
-//         name: AppRoutes.progressNotes,
-//         builder: (context, state) {
-//           final extra = state.extra as Map<String, dynamic>;
-//           return ProgressNotesScreen(
-//             studentName: extra['studentName'] as String,
-//             studentId: extra['studentId'] as String,
-//           );
-//         },
-//       ),
-
-//       // ── Student Routes ───────────────────────────────────────────────────
-//       GoRoute(
-//         path: AppRoutes.studentDashboard,
-//         name: AppRoutes.studentDashboard,
-//         builder: (context, state) => const StudentDashboardScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.teacherList,
-//         name: AppRoutes.teacherList,
-//         builder: (context, state) {
-//           final extra = state.extra as Map<String, dynamic>?;
-//           final course = extra?['course'] as String? ?? '';
-//           return TeacherListScreen(selectedCourse: course);
-//         },
-//       ),
-//       GoRoute(
-//         path: AppRoutes.studentBooking,
-//         name: AppRoutes.studentBooking,
-//         builder: (context, state) {
-//           final extra = state.extra as Map<String, dynamic>;
-//           return StudentBookingScreen(
-//             teacher: extra['teacher'] as TeacherListModel,
-//           );
-//         },
-//       ),
-//       GoRoute(
-//         path: AppRoutes.studentSchedule,
-//         name: AppRoutes.studentSchedule,
-//         builder: (context, state) => const StudentScheduleScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.studentProgress,
-//         name: AppRoutes.studentProgress,
-//         builder: (context, state) => const StudentProgressScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.subscription,
-//         name: AppRoutes.subscription,
-//         builder: (context, state) => const SubscriptionScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.studentClassroom,
-//         name: AppRoutes.studentClassroom,
-//         builder: (context, state) {
-//           final extra = state.extra as Map<String, dynamic>;
-//           return StudentClassScreen(
-//             teacherName: extra['teacherName'] as String,
-//             subject: extra['subject'] as String,
-//             time: extra['time'] as String,
-//           );
-//         },
-//       ),
-//       GoRoute(
-//         path: AppRoutes.chatList,
-//         name: AppRoutes.chatList,
-//         builder: (context, state) => const ChatListScreen(),
-//       ),
-//       GoRoute(
-//         path: AppRoutes.chatConversation,
-//         builder: (ctx, state) {
-//           final e = state.extra as Map<String, dynamic>;
-//           return ChatRoomScreen(
-//             roomId: e['roomId'] as String,
-//             userName: e['userName'] as String,
-//             userAvatar: e['userAvatar'] as String? ?? '',
-//             userId: e['userId'] as String,
-//           );
-//         },
-//       ),
-//     ],
-//   );
-// }
-
-// class AppRoutes {
-//   // Auth
-//   static const String splash = '/';
-//   static const String login = '/login';
-//   static const String signup = '/signup';
-//   static const String teacherAvailability = '/teacher-availability';
-//   static const String approvalPending = '/approval-pending';
-
-//   // Teacher
-//   static const String dashboard = '/dashboard';
-//   static const String availability = '/availability';
-//   static const String bookings = '/bookings';
-//   static const String classroom = '/classroom';
-//   static const String progressNotes = '/progress-notes';
-
-//   // Student
-//   static const String studentDashboard = '/student-dashboard';
-//   static const String teacherList = '/teacher-list';
-//   static const String studentBooking = '/student-booking';
-//   static const String studentSchedule = '/student-schedule';
-//   static const String studentProgress = '/student-progress';
-//   static const String subscription = '/subscription';
-//   static const String studentClassroom = '/student-classroom';
-
-//   // Chat
-//   static const String chatList = '/chat-list';
-//   static const String chatConversation = '/chat-conversation';
-// }
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quran_learning_app/core/utils/booking_schedule_utils.dart';
 
 // Auth
 import 'package:quran_learning_app/features/auth/login_screen.dart';
@@ -196,23 +10,29 @@ import 'package:quran_learning_app/features/auth/approval_pending_screen.dart';
 
 // Core
 import 'package:quran_learning_app/features/splash_screen.dart';
+import 'package:quran_learning_app/features/teacher/classroom_screen.dart';
 import 'package:quran_learning_app/features/update_availabilty_screen.dart';
 
 // Teacher
 import 'package:quran_learning_app/features/teacher/dashboard_screen.dart';
 import 'package:quran_learning_app/features/teacher/booking_screen.dart';
-import 'package:quran_learning_app/features/teacher/class_screen.dart';
 import 'package:quran_learning_app/features/teacher/progress_note_screen.dart';
 import 'package:quran_learning_app/features/teacher/chat_list_screen.dart';
 
 // Student
 import 'package:quran_learning_app/features/teacher/student_dashboard_screen.dart';
 import 'package:quran_learning_app/features/teacher/student_booking_screen.dart';
-import 'package:quran_learning_app/features/teacher/student_class_screen.dart';
 import 'package:quran_learning_app/features/teacher/widget/teacher_list_screen.dart';
 import 'package:quran_learning_app/features/teacher/widget/schedule_screen.dart';
 import 'package:quran_learning_app/features/teacher/widget/student_progress.dart';
 import 'package:quran_learning_app/features/teacher/widget/subscription_screen.dart';
+import 'package:quran_learning_app/features/teacher/widget/class_endscreen.dart';
+
+// Chat
+import 'package:quran_learning_app/features/teacher/chatroom_screen.dart';
+
+// Profile
+import 'package:quran_learning_app/features/profile/profile_screen.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -241,6 +61,10 @@ class AppRouter {
         path: AppRoutes.approvalPending,
         builder: (context, state) => const ApprovalPendingScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileScreen(),
+      ),
 
       // ───── Teacher ─────
       GoRoute(
@@ -256,14 +80,22 @@ class AppRouter {
         builder: (context, state) => const BookingsScreen(),
       ),
 
+      // Classroom route ko is tarah update karein:
       GoRoute(
         path: AppRoutes.classroom,
         builder: (context, state) {
           final e = state.extra as Map<String, dynamic>;
-          return ClassScreen(
-            studentName: e['studentName'],
-            subject: e['subject'],
+          return ClassroomScreen(
+            channelName: e['channelName'],
+            otherPersonName: e['otherPersonName'],
             time: e['time'],
+            localUid: e['localUid'] ?? 0,
+            scheduledAt: parseClassroomExtraScheduledAt(e),
+            durationMinutes: e['durationMinutes'] ?? 30,
+            studentId: e['studentId'],
+            teacherId: e['teacherId'],
+            studentName: e['studentName'],
+            isTeacher: e['isTeacher'] ?? false,
           );
         },
       ),
@@ -271,10 +103,26 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.progressNotes,
         builder: (context, state) {
-          final e = state.extra as Map<String, dynamic>;
+          final e = state.extra as Map<String, dynamic>? ?? {};
+
           return ProgressNotesScreen(
-            studentName: e['studentName'],
-            studentId: e['studentId'],
+            studentName: e['studentName']?.toString() ?? '',
+            studentId: e['studentId']?.toString() ?? '',
+            teacherId: e['teacherId']?.toString() ?? '',
+            isTeacher: e['isTeacher'] == true,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.classEnd,
+        builder: (context, state) {
+          final e = state.extra as Map<String, dynamic>? ?? {};
+          return ClassEndScreen(
+            studentId: e['studentId']?.toString() ?? '',
+            teacherId: e['teacherId']?.toString() ?? '',
+            studentName: e['studentName']?.toString() ?? '',
+            isTeacher: e['isTeacher'] == true,
+            durationMinutes: (e['durationMinutes'] as num?)?.toInt() ?? 30,
           );
         },
       ),
@@ -288,8 +136,7 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.teacherList,
         builder: (context, state) {
-          final e = state.extra as Map<String, dynamic>?;
-          return TeacherListScreen(selectedCourse: e?['course'] ?? '');
+          return TeacherListScreen();
         },
       ),
 
@@ -305,10 +152,16 @@ class AppRouter {
         path: AppRoutes.studentSchedule,
         builder: (context, state) => const StudentScheduleScreen(),
       ),
-
       GoRoute(
         path: AppRoutes.studentProgress,
-        builder: (context, state) => const StudentProgressScreen(),
+        builder: (context, state) {
+          final studentId =
+              (state.extra as String?) ??
+              FirebaseAuth.instance.currentUser?.uid ??
+              '';
+
+          return StudentProgressScreen(studentId: studentId);
+        },
       ),
 
       GoRoute(
@@ -316,14 +169,22 @@ class AppRouter {
         builder: (context, state) => const SubscriptionScreen(),
       ),
 
+      // ───── Student Classroom ─────
       GoRoute(
         path: AppRoutes.studentClassroom,
         builder: (context, state) {
           final e = state.extra as Map<String, dynamic>;
-          return StudentClassScreen(
-            teacherName: e['teacherName'],
-            subject: e['subject'],
+          return ClassroomScreen(
+            channelName: e['channelName'],
+            otherPersonName: e['otherPersonName'],
             time: e['time'],
+            localUid: e['localUid'] ?? 0,
+            scheduledAt: parseClassroomExtraScheduledAt(e),
+            durationMinutes: e['durationMinutes'] ?? 30,
+            studentId: e['studentId'],
+            teacherId: e['teacherId'],
+            studentName: e['studentName'],
+            isTeacher: e['isTeacher'] ?? false,
           );
         },
       ),
@@ -342,9 +203,9 @@ class AppRouter {
 
           return ChatRoomScreen(
             roomId: e['roomId'],
-            studentName: e['studentName'],
-            studentImage: e['studentImage'] ?? '',
-            studentId: e['studentId'],
+            userName: e['userName'],
+            userAvatar: e['userAvatar'] ?? '',
+            userId: e['userId'],
           );
         },
       ),
@@ -364,6 +225,7 @@ class AppRoutes {
   static const bookings = '/bookings';
   static const classroom = '/classroom';
   static const progressNotes = '/progress-notes';
+  static const classEnd = '/class-end';
 
   static const studentDashboard = '/student-dashboard';
   static const teacherList = '/teacher-list';
@@ -375,4 +237,5 @@ class AppRoutes {
 
   static const chatList = '/chat-list';
   static const chatConversation = '/chat-conversation';
+  static const profile = '/profile';
 }

@@ -1,10 +1,3 @@
-// lib/provider/teacher_provider.dart
-//
-// ── Purani file completely replace ho gayi ──
-// Ab yahan koi dummy data nahi, sab Firestore realtime streams hain
-// UpcomingClassModel hata diya — TeacherClassModel use hota hai
-// StateNotifier hata diya — StreamProvider use ho raha hai
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,6 +89,4 @@ final filteredUpcomingProvider = Provider<List<TeacherClassModel>>((ref) {
       .toList();
 });
 
-// ─── Backward compat — purana provider naam bhi kaam kare ────────────────────
-// Agar koi aur file teacherDashboardProvider use karti ho
 final teacherDashboardProvider = teacherProfileProvider;

@@ -45,6 +45,7 @@ class AppDrawer extends ConsumerWidget {
               title: const Text('Profile'),
               onTap: () {
                 context.pop(); // Close drawer
+                context.push(AppRoutes.profile);
               },
             ),
             const Divider(),

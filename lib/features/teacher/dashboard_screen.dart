@@ -887,6 +887,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(teacherNotificationScheduler); // Activate scheduler
     final teacherAsync = ref.watch(teacherProfileProvider);
     final stats = ref.watch(dashboardStatsProvider);
     final upcoming = ref.watch(filteredUpcomingProvider);
@@ -989,12 +990,22 @@ class DashboardScreen extends ConsumerWidget {
                     cls: cls,
                     w: w,
                     h: h,
-                    onJoin: () => context.go(
+                    onJoin: () => context.push(
                       AppRoutes.classroom,
                       extra: {
-                        'studentName': cls.studentName,
-                        'subject': cls.subject,
+                        'channelName': cls.id,
+                        'otherPersonName': cls.studentName,
                         'time': DateFormat('hh:mm a').format(cls.scheduledAt),
+                        'scheduledAt': cls.scheduledAt,
+                        'date':
+                            '${cls.scheduledAt.year}-${cls.scheduledAt.month.toString().padLeft(2, '0')}-${cls.scheduledAt.day.toString().padLeft(2, '0')}',
+                        'slotTime':
+                            DateFormat('h:mm a').format(cls.scheduledAt),
+                        'durationMinutes': cls.durationMinutes ?? 30,
+                        'studentId': cls.studentId ?? '',
+                        'teacherId': cls.teacherId ?? '',
+                        'studentName': cls.studentName,
+                        'isTeacher': true,
                       },
                     ),
                   ),

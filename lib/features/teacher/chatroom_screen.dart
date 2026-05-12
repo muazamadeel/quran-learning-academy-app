@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:quran_learning_app/core/theme/app_theme.dart';
 import 'package:quran_learning_app/models/chat/chat_model.dart';
+import 'package:quran_learning_app/provider/auth/auth_provider.dart';
 import 'package:quran_learning_app/provider/chat_provider.dart';
 
 class ChatRoomScreen extends ConsumerStatefulWidget {
@@ -99,7 +100,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     final messagesAsync = ref.watch(messagesProvider(widget.roomId));
 
     // Naya message aaye to scroll down
-    ref.listen(messagesProvider(widget.roomId), (_, _x) => _scrollToBottom());
+    ref.listen(messagesProvider(widget.roomId), (_, x) => _scrollToBottom());
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -229,7 +230,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                   ),
                 ),
                 Text(
-                  'Student',
+                  ref.watch(authProvider).isStudent ? 'Teacher' : 'Student',
                   style: TextStyle(color: Colors.white70, fontSize: w * 0.028),
                 ),
               ],

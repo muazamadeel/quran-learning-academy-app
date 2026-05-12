@@ -18,6 +18,8 @@ _TeacherClassModel _$TeacherClassModelFromJson(Map<String, dynamic> json) =>
       studentReview: json['studentReview'] as String?,
       durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
       meetingLink: json['meetingLink'] as String?,
+      studentId: json['studentId'] as String?,
+      teacherId: json['teacherId'] as String?,
     );
 
 Map<String, dynamic> _$TeacherClassModelToJson(_TeacherClassModel instance) =>
@@ -32,4 +34,6 @@ Map<String, dynamic> _$TeacherClassModelToJson(_TeacherClassModel instance) =>
       'studentReview': instance.studentReview,
       'durationMinutes': instance.durationMinutes,
       'meetingLink': instance.meetingLink,
+      'studentId': instance.studentId,
+      'teacherId': instance.teacherId,
     };

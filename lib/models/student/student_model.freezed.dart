@@ -302,7 +302,7 @@ as bool,
 /// @nodoc
 mixin _$TeacherListModel {
 
- String get id; String get name; String get experience; List<String> get languages; double get rating; int get totalStudents; String get profileImage; bool get isAvailable; List<String> get subjects; String get country; String get timezone; Map<String, dynamic> get availability;
+ String get id; String get name; String get experience; List<String> get languages; double get rating; int get totalStudents; String get profileImage; bool get isAvailable; String get country; String get timezone; Map<String, dynamic> get availability;
 /// Create a copy of TeacherListModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -315,16 +315,16 @@ $TeacherListModelCopyWith<TeacherListModel> get copyWith => _$TeacherListModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TeacherListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.experience, experience) || other.experience == experience)&&const DeepCollectionEquality().equals(other.languages, languages)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.totalStudents, totalStudents) || other.totalStudents == totalStudents)&&(identical(other.profileImage, profileImage) || other.profileImage == profileImage)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&const DeepCollectionEquality().equals(other.subjects, subjects)&&(identical(other.country, country) || other.country == country)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other.availability, availability));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TeacherListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.experience, experience) || other.experience == experience)&&const DeepCollectionEquality().equals(other.languages, languages)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.totalStudents, totalStudents) || other.totalStudents == totalStudents)&&(identical(other.profileImage, profileImage) || other.profileImage == profileImage)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&(identical(other.country, country) || other.country == country)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other.availability, availability));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,experience,const DeepCollectionEquality().hash(languages),rating,totalStudents,profileImage,isAvailable,const DeepCollectionEquality().hash(subjects),country,timezone,const DeepCollectionEquality().hash(availability));
+int get hashCode => Object.hash(runtimeType,id,name,experience,const DeepCollectionEquality().hash(languages),rating,totalStudents,profileImage,isAvailable,country,timezone,const DeepCollectionEquality().hash(availability));
 
 @override
 String toString() {
-  return 'TeacherListModel(id: $id, name: $name, experience: $experience, languages: $languages, rating: $rating, totalStudents: $totalStudents, profileImage: $profileImage, isAvailable: $isAvailable, subjects: $subjects, country: $country, timezone: $timezone, availability: $availability)';
+  return 'TeacherListModel(id: $id, name: $name, experience: $experience, languages: $languages, rating: $rating, totalStudents: $totalStudents, profileImage: $profileImage, isAvailable: $isAvailable, country: $country, timezone: $timezone, availability: $availability)';
 }
 
 
@@ -335,7 +335,7 @@ abstract mixin class $TeacherListModelCopyWith<$Res>  {
   factory $TeacherListModelCopyWith(TeacherListModel value, $Res Function(TeacherListModel) _then) = _$TeacherListModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String experience, List<String> languages, double rating, int totalStudents, String profileImage, bool isAvailable, List<String> subjects, String country, String timezone, Map<String, dynamic> availability
+ String id, String name, String experience, List<String> languages, double rating, int totalStudents, String profileImage, bool isAvailable, String country, String timezone, Map<String, dynamic> availability
 });
 
 
@@ -352,7 +352,7 @@ class _$TeacherListModelCopyWithImpl<$Res>
 
 /// Create a copy of TeacherListModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? experience = null,Object? languages = null,Object? rating = null,Object? totalStudents = null,Object? profileImage = null,Object? isAvailable = null,Object? subjects = null,Object? country = null,Object? timezone = null,Object? availability = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? experience = null,Object? languages = null,Object? rating = null,Object? totalStudents = null,Object? profileImage = null,Object? isAvailable = null,Object? country = null,Object? timezone = null,Object? availability = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -362,8 +362,7 @@ as List<String>,rating: null == rating ? _self.rating : rating // ignore: cast_n
 as double,totalStudents: null == totalStudents ? _self.totalStudents : totalStudents // ignore: cast_nullable_to_non_nullable
 as int,profileImage: null == profileImage ? _self.profileImage : profileImage // ignore: cast_nullable_to_non_nullable
 as String,isAvailable: null == isAvailable ? _self.isAvailable : isAvailable // ignore: cast_nullable_to_non_nullable
-as bool,subjects: null == subjects ? _self.subjects : subjects // ignore: cast_nullable_to_non_nullable
-as List<String>,country: null == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as bool,country: null == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
 as String,timezone: null == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
 as String,availability: null == availability ? _self.availability : availability // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,
@@ -451,10 +450,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String experience,  List<String> languages,  double rating,  int totalStudents,  String profileImage,  bool isAvailable,  List<String> subjects,  String country,  String timezone,  Map<String, dynamic> availability)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String experience,  List<String> languages,  double rating,  int totalStudents,  String profileImage,  bool isAvailable,  String country,  String timezone,  Map<String, dynamic> availability)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TeacherListModel() when $default != null:
-return $default(_that.id,_that.name,_that.experience,_that.languages,_that.rating,_that.totalStudents,_that.profileImage,_that.isAvailable,_that.subjects,_that.country,_that.timezone,_that.availability);case _:
+return $default(_that.id,_that.name,_that.experience,_that.languages,_that.rating,_that.totalStudents,_that.profileImage,_that.isAvailable,_that.country,_that.timezone,_that.availability);case _:
   return orElse();
 
 }
@@ -472,10 +471,10 @@ return $default(_that.id,_that.name,_that.experience,_that.languages,_that.ratin
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String experience,  List<String> languages,  double rating,  int totalStudents,  String profileImage,  bool isAvailable,  List<String> subjects,  String country,  String timezone,  Map<String, dynamic> availability)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String experience,  List<String> languages,  double rating,  int totalStudents,  String profileImage,  bool isAvailable,  String country,  String timezone,  Map<String, dynamic> availability)  $default,) {final _that = this;
 switch (_that) {
 case _TeacherListModel():
-return $default(_that.id,_that.name,_that.experience,_that.languages,_that.rating,_that.totalStudents,_that.profileImage,_that.isAvailable,_that.subjects,_that.country,_that.timezone,_that.availability);case _:
+return $default(_that.id,_that.name,_that.experience,_that.languages,_that.rating,_that.totalStudents,_that.profileImage,_that.isAvailable,_that.country,_that.timezone,_that.availability);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -492,10 +491,10 @@ return $default(_that.id,_that.name,_that.experience,_that.languages,_that.ratin
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String experience,  List<String> languages,  double rating,  int totalStudents,  String profileImage,  bool isAvailable,  List<String> subjects,  String country,  String timezone,  Map<String, dynamic> availability)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String experience,  List<String> languages,  double rating,  int totalStudents,  String profileImage,  bool isAvailable,  String country,  String timezone,  Map<String, dynamic> availability)?  $default,) {final _that = this;
 switch (_that) {
 case _TeacherListModel() when $default != null:
-return $default(_that.id,_that.name,_that.experience,_that.languages,_that.rating,_that.totalStudents,_that.profileImage,_that.isAvailable,_that.subjects,_that.country,_that.timezone,_that.availability);case _:
+return $default(_that.id,_that.name,_that.experience,_that.languages,_that.rating,_that.totalStudents,_that.profileImage,_that.isAvailable,_that.country,_that.timezone,_that.availability);case _:
   return null;
 
 }
@@ -507,7 +506,7 @@ return $default(_that.id,_that.name,_that.experience,_that.languages,_that.ratin
 @JsonSerializable()
 
 class _TeacherListModel implements TeacherListModel {
-  const _TeacherListModel({required this.id, required this.name, required this.experience, required final  List<String> languages, required this.rating, required this.totalStudents, this.profileImage = '', this.isAvailable = true, final  List<String> subjects = const [], this.country = '', this.timezone = '', final  Map<String, dynamic> availability = const <String, dynamic>{}}): _languages = languages,_subjects = subjects,_availability = availability;
+  const _TeacherListModel({required this.id, required this.name, required this.experience, required final  List<String> languages, required this.rating, required this.totalStudents, this.profileImage = '', this.isAvailable = true, this.country = '', this.timezone = '', final  Map<String, dynamic> availability = const <String, dynamic>{}}): _languages = languages,_availability = availability;
   factory _TeacherListModel.fromJson(Map<String, dynamic> json) => _$TeacherListModelFromJson(json);
 
 @override final  String id;
@@ -524,13 +523,6 @@ class _TeacherListModel implements TeacherListModel {
 @override final  int totalStudents;
 @override@JsonKey() final  String profileImage;
 @override@JsonKey() final  bool isAvailable;
- final  List<String> _subjects;
-@override@JsonKey() List<String> get subjects {
-  if (_subjects is EqualUnmodifiableListView) return _subjects;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_subjects);
-}
-
 @override@JsonKey() final  String country;
 @override@JsonKey() final  String timezone;
  final  Map<String, dynamic> _availability;
@@ -554,16 +546,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TeacherListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.experience, experience) || other.experience == experience)&&const DeepCollectionEquality().equals(other._languages, _languages)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.totalStudents, totalStudents) || other.totalStudents == totalStudents)&&(identical(other.profileImage, profileImage) || other.profileImage == profileImage)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&const DeepCollectionEquality().equals(other._subjects, _subjects)&&(identical(other.country, country) || other.country == country)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other._availability, _availability));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TeacherListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.experience, experience) || other.experience == experience)&&const DeepCollectionEquality().equals(other._languages, _languages)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.totalStudents, totalStudents) || other.totalStudents == totalStudents)&&(identical(other.profileImage, profileImage) || other.profileImage == profileImage)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable)&&(identical(other.country, country) || other.country == country)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&const DeepCollectionEquality().equals(other._availability, _availability));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,experience,const DeepCollectionEquality().hash(_languages),rating,totalStudents,profileImage,isAvailable,const DeepCollectionEquality().hash(_subjects),country,timezone,const DeepCollectionEquality().hash(_availability));
+int get hashCode => Object.hash(runtimeType,id,name,experience,const DeepCollectionEquality().hash(_languages),rating,totalStudents,profileImage,isAvailable,country,timezone,const DeepCollectionEquality().hash(_availability));
 
 @override
 String toString() {
-  return 'TeacherListModel(id: $id, name: $name, experience: $experience, languages: $languages, rating: $rating, totalStudents: $totalStudents, profileImage: $profileImage, isAvailable: $isAvailable, subjects: $subjects, country: $country, timezone: $timezone, availability: $availability)';
+  return 'TeacherListModel(id: $id, name: $name, experience: $experience, languages: $languages, rating: $rating, totalStudents: $totalStudents, profileImage: $profileImage, isAvailable: $isAvailable, country: $country, timezone: $timezone, availability: $availability)';
 }
 
 
@@ -574,7 +566,7 @@ abstract mixin class _$TeacherListModelCopyWith<$Res> implements $TeacherListMod
   factory _$TeacherListModelCopyWith(_TeacherListModel value, $Res Function(_TeacherListModel) _then) = __$TeacherListModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String experience, List<String> languages, double rating, int totalStudents, String profileImage, bool isAvailable, List<String> subjects, String country, String timezone, Map<String, dynamic> availability
+ String id, String name, String experience, List<String> languages, double rating, int totalStudents, String profileImage, bool isAvailable, String country, String timezone, Map<String, dynamic> availability
 });
 
 
@@ -591,7 +583,7 @@ class __$TeacherListModelCopyWithImpl<$Res>
 
 /// Create a copy of TeacherListModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? experience = null,Object? languages = null,Object? rating = null,Object? totalStudents = null,Object? profileImage = null,Object? isAvailable = null,Object? subjects = null,Object? country = null,Object? timezone = null,Object? availability = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? experience = null,Object? languages = null,Object? rating = null,Object? totalStudents = null,Object? profileImage = null,Object? isAvailable = null,Object? country = null,Object? timezone = null,Object? availability = null,}) {
   return _then(_TeacherListModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -601,8 +593,7 @@ as List<String>,rating: null == rating ? _self.rating : rating // ignore: cast_n
 as double,totalStudents: null == totalStudents ? _self.totalStudents : totalStudents // ignore: cast_nullable_to_non_nullable
 as int,profileImage: null == profileImage ? _self.profileImage : profileImage // ignore: cast_nullable_to_non_nullable
 as String,isAvailable: null == isAvailable ? _self.isAvailable : isAvailable // ignore: cast_nullable_to_non_nullable
-as bool,subjects: null == subjects ? _self._subjects : subjects // ignore: cast_nullable_to_non_nullable
-as List<String>,country: null == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as bool,country: null == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
 as String,timezone: null == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
 as String,availability: null == availability ? _self._availability : availability // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,
@@ -616,7 +607,7 @@ as Map<String, dynamic>,
 /// @nodoc
 mixin _$StudentUpcomingClassModel {
 
- String get id; String get teacherName; String get teacherImage; String get time; String get date; String get subject; String get status;
+ String get id; String get teacherName; String get teacherImage; String get time; String get date; String get status; String? get teacherId; String? get studentId; DateTime? get scheduledAt; int? get durationMinutes;
 /// Create a copy of StudentUpcomingClassModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -629,16 +620,16 @@ $StudentUpcomingClassModelCopyWith<StudentUpcomingClassModel> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentUpcomingClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.teacherImage, teacherImage) || other.teacherImage == teacherImage)&&(identical(other.time, time) || other.time == time)&&(identical(other.date, date) || other.date == date)&&(identical(other.subject, subject) || other.subject == subject)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentUpcomingClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.teacherImage, teacherImage) || other.teacherImage == teacherImage)&&(identical(other.time, time) || other.time == time)&&(identical(other.date, date) || other.date == date)&&(identical(other.status, status) || other.status == status)&&(identical(other.teacherId, teacherId) || other.teacherId == teacherId)&&(identical(other.studentId, studentId) || other.studentId == studentId)&&(identical(other.scheduledAt, scheduledAt) || other.scheduledAt == scheduledAt)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,teacherName,teacherImage,time,date,subject,status);
+int get hashCode => Object.hash(runtimeType,id,teacherName,teacherImage,time,date,status,teacherId,studentId,scheduledAt,durationMinutes);
 
 @override
 String toString() {
-  return 'StudentUpcomingClassModel(id: $id, teacherName: $teacherName, teacherImage: $teacherImage, time: $time, date: $date, subject: $subject, status: $status)';
+  return 'StudentUpcomingClassModel(id: $id, teacherName: $teacherName, teacherImage: $teacherImage, time: $time, date: $date, status: $status, teacherId: $teacherId, studentId: $studentId, scheduledAt: $scheduledAt, durationMinutes: $durationMinutes)';
 }
 
 
@@ -649,7 +640,7 @@ abstract mixin class $StudentUpcomingClassModelCopyWith<$Res>  {
   factory $StudentUpcomingClassModelCopyWith(StudentUpcomingClassModel value, $Res Function(StudentUpcomingClassModel) _then) = _$StudentUpcomingClassModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String teacherName, String teacherImage, String time, String date, String subject, String status
+ String id, String teacherName, String teacherImage, String time, String date, String status, String? teacherId, String? studentId, DateTime? scheduledAt, int? durationMinutes
 });
 
 
@@ -666,16 +657,19 @@ class _$StudentUpcomingClassModelCopyWithImpl<$Res>
 
 /// Create a copy of StudentUpcomingClassModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? teacherName = null,Object? teacherImage = null,Object? time = null,Object? date = null,Object? subject = null,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? teacherName = null,Object? teacherImage = null,Object? time = null,Object? date = null,Object? status = null,Object? teacherId = freezed,Object? studentId = freezed,Object? scheduledAt = freezed,Object? durationMinutes = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,teacherName: null == teacherName ? _self.teacherName : teacherName // ignore: cast_nullable_to_non_nullable
 as String,teacherImage: null == teacherImage ? _self.teacherImage : teacherImage // ignore: cast_nullable_to_non_nullable
 as String,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
-as String,subject: null == subject ? _self.subject : subject // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,
+as String,teacherId: freezed == teacherId ? _self.teacherId : teacherId // ignore: cast_nullable_to_non_nullable
+as String?,studentId: freezed == studentId ? _self.studentId : studentId // ignore: cast_nullable_to_non_nullable
+as String?,scheduledAt: freezed == scheduledAt ? _self.scheduledAt : scheduledAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,durationMinutes: freezed == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -760,10 +754,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String teacherName,  String teacherImage,  String time,  String date,  String subject,  String status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String teacherName,  String teacherImage,  String time,  String date,  String status,  String? teacherId,  String? studentId,  DateTime? scheduledAt,  int? durationMinutes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StudentUpcomingClassModel() when $default != null:
-return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.date,_that.subject,_that.status);case _:
+return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.date,_that.status,_that.teacherId,_that.studentId,_that.scheduledAt,_that.durationMinutes);case _:
   return orElse();
 
 }
@@ -781,10 +775,10 @@ return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String teacherName,  String teacherImage,  String time,  String date,  String subject,  String status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String teacherName,  String teacherImage,  String time,  String date,  String status,  String? teacherId,  String? studentId,  DateTime? scheduledAt,  int? durationMinutes)  $default,) {final _that = this;
 switch (_that) {
 case _StudentUpcomingClassModel():
-return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.date,_that.subject,_that.status);case _:
+return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.date,_that.status,_that.teacherId,_that.studentId,_that.scheduledAt,_that.durationMinutes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -801,10 +795,10 @@ return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String teacherName,  String teacherImage,  String time,  String date,  String subject,  String status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String teacherName,  String teacherImage,  String time,  String date,  String status,  String? teacherId,  String? studentId,  DateTime? scheduledAt,  int? durationMinutes)?  $default,) {final _that = this;
 switch (_that) {
 case _StudentUpcomingClassModel() when $default != null:
-return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.date,_that.subject,_that.status);case _:
+return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.date,_that.status,_that.teacherId,_that.studentId,_that.scheduledAt,_that.durationMinutes);case _:
   return null;
 
 }
@@ -816,7 +810,7 @@ return $default(_that.id,_that.teacherName,_that.teacherImage,_that.time,_that.d
 @JsonSerializable()
 
 class _StudentUpcomingClassModel implements StudentUpcomingClassModel {
-  const _StudentUpcomingClassModel({required this.id, required this.teacherName, required this.teacherImage, required this.time, required this.date, required this.subject, this.status = 'upcoming'});
+  const _StudentUpcomingClassModel({required this.id, required this.teacherName, required this.teacherImage, required this.time, required this.date, this.status = 'upcoming', this.teacherId, this.studentId, this.scheduledAt, this.durationMinutes});
   factory _StudentUpcomingClassModel.fromJson(Map<String, dynamic> json) => _$StudentUpcomingClassModelFromJson(json);
 
 @override final  String id;
@@ -824,8 +818,11 @@ class _StudentUpcomingClassModel implements StudentUpcomingClassModel {
 @override final  String teacherImage;
 @override final  String time;
 @override final  String date;
-@override final  String subject;
 @override@JsonKey() final  String status;
+@override final  String? teacherId;
+@override final  String? studentId;
+@override final  DateTime? scheduledAt;
+@override final  int? durationMinutes;
 
 /// Create a copy of StudentUpcomingClassModel
 /// with the given fields replaced by the non-null parameter values.
@@ -840,16 +837,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentUpcomingClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.teacherImage, teacherImage) || other.teacherImage == teacherImage)&&(identical(other.time, time) || other.time == time)&&(identical(other.date, date) || other.date == date)&&(identical(other.subject, subject) || other.subject == subject)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentUpcomingClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.teacherImage, teacherImage) || other.teacherImage == teacherImage)&&(identical(other.time, time) || other.time == time)&&(identical(other.date, date) || other.date == date)&&(identical(other.status, status) || other.status == status)&&(identical(other.teacherId, teacherId) || other.teacherId == teacherId)&&(identical(other.studentId, studentId) || other.studentId == studentId)&&(identical(other.scheduledAt, scheduledAt) || other.scheduledAt == scheduledAt)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,teacherName,teacherImage,time,date,subject,status);
+int get hashCode => Object.hash(runtimeType,id,teacherName,teacherImage,time,date,status,teacherId,studentId,scheduledAt,durationMinutes);
 
 @override
 String toString() {
-  return 'StudentUpcomingClassModel(id: $id, teacherName: $teacherName, teacherImage: $teacherImage, time: $time, date: $date, subject: $subject, status: $status)';
+  return 'StudentUpcomingClassModel(id: $id, teacherName: $teacherName, teacherImage: $teacherImage, time: $time, date: $date, status: $status, teacherId: $teacherId, studentId: $studentId, scheduledAt: $scheduledAt, durationMinutes: $durationMinutes)';
 }
 
 
@@ -860,7 +857,7 @@ abstract mixin class _$StudentUpcomingClassModelCopyWith<$Res> implements $Stude
   factory _$StudentUpcomingClassModelCopyWith(_StudentUpcomingClassModel value, $Res Function(_StudentUpcomingClassModel) _then) = __$StudentUpcomingClassModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String teacherName, String teacherImage, String time, String date, String subject, String status
+ String id, String teacherName, String teacherImage, String time, String date, String status, String? teacherId, String? studentId, DateTime? scheduledAt, int? durationMinutes
 });
 
 
@@ -877,16 +874,19 @@ class __$StudentUpcomingClassModelCopyWithImpl<$Res>
 
 /// Create a copy of StudentUpcomingClassModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? teacherName = null,Object? teacherImage = null,Object? time = null,Object? date = null,Object? subject = null,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? teacherName = null,Object? teacherImage = null,Object? time = null,Object? date = null,Object? status = null,Object? teacherId = freezed,Object? studentId = freezed,Object? scheduledAt = freezed,Object? durationMinutes = freezed,}) {
   return _then(_StudentUpcomingClassModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,teacherName: null == teacherName ? _self.teacherName : teacherName // ignore: cast_nullable_to_non_nullable
 as String,teacherImage: null == teacherImage ? _self.teacherImage : teacherImage // ignore: cast_nullable_to_non_nullable
 as String,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
-as String,subject: null == subject ? _self.subject : subject // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,
+as String,teacherId: freezed == teacherId ? _self.teacherId : teacherId // ignore: cast_nullable_to_non_nullable
+as String?,studentId: freezed == studentId ? _self.studentId : studentId // ignore: cast_nullable_to_non_nullable
+as String?,scheduledAt: freezed == scheduledAt ? _self.scheduledAt : scheduledAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,durationMinutes: freezed == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -897,7 +897,7 @@ as String,
 /// @nodoc
 mixin _$StudentProgressModel {
 
- String get id; String get teacherName; String get subject; String get date; String get progressNote; String get whatWasCovered; String get homework; String get rating;
+ String get id; String get teacherName; String get date; String get progressNote; String get whatWasCovered; String get homework; String get rating;
 /// Create a copy of StudentProgressModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -910,16 +910,16 @@ $StudentProgressModelCopyWith<StudentProgressModel> get copyWith => _$StudentPro
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentProgressModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.subject, subject) || other.subject == subject)&&(identical(other.date, date) || other.date == date)&&(identical(other.progressNote, progressNote) || other.progressNote == progressNote)&&(identical(other.whatWasCovered, whatWasCovered) || other.whatWasCovered == whatWasCovered)&&(identical(other.homework, homework) || other.homework == homework)&&(identical(other.rating, rating) || other.rating == rating));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentProgressModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.date, date) || other.date == date)&&(identical(other.progressNote, progressNote) || other.progressNote == progressNote)&&(identical(other.whatWasCovered, whatWasCovered) || other.whatWasCovered == whatWasCovered)&&(identical(other.homework, homework) || other.homework == homework)&&(identical(other.rating, rating) || other.rating == rating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,teacherName,subject,date,progressNote,whatWasCovered,homework,rating);
+int get hashCode => Object.hash(runtimeType,id,teacherName,date,progressNote,whatWasCovered,homework,rating);
 
 @override
 String toString() {
-  return 'StudentProgressModel(id: $id, teacherName: $teacherName, subject: $subject, date: $date, progressNote: $progressNote, whatWasCovered: $whatWasCovered, homework: $homework, rating: $rating)';
+  return 'StudentProgressModel(id: $id, teacherName: $teacherName, date: $date, progressNote: $progressNote, whatWasCovered: $whatWasCovered, homework: $homework, rating: $rating)';
 }
 
 
@@ -930,7 +930,7 @@ abstract mixin class $StudentProgressModelCopyWith<$Res>  {
   factory $StudentProgressModelCopyWith(StudentProgressModel value, $Res Function(StudentProgressModel) _then) = _$StudentProgressModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String teacherName, String subject, String date, String progressNote, String whatWasCovered, String homework, String rating
+ String id, String teacherName, String date, String progressNote, String whatWasCovered, String homework, String rating
 });
 
 
@@ -947,11 +947,10 @@ class _$StudentProgressModelCopyWithImpl<$Res>
 
 /// Create a copy of StudentProgressModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? teacherName = null,Object? subject = null,Object? date = null,Object? progressNote = null,Object? whatWasCovered = null,Object? homework = null,Object? rating = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? teacherName = null,Object? date = null,Object? progressNote = null,Object? whatWasCovered = null,Object? homework = null,Object? rating = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,teacherName: null == teacherName ? _self.teacherName : teacherName // ignore: cast_nullable_to_non_nullable
-as String,subject: null == subject ? _self.subject : subject // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as String,progressNote: null == progressNote ? _self.progressNote : progressNote // ignore: cast_nullable_to_non_nullable
 as String,whatWasCovered: null == whatWasCovered ? _self.whatWasCovered : whatWasCovered // ignore: cast_nullable_to_non_nullable
@@ -1042,10 +1041,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String teacherName,  String subject,  String date,  String progressNote,  String whatWasCovered,  String homework,  String rating)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String teacherName,  String date,  String progressNote,  String whatWasCovered,  String homework,  String rating)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StudentProgressModel() when $default != null:
-return $default(_that.id,_that.teacherName,_that.subject,_that.date,_that.progressNote,_that.whatWasCovered,_that.homework,_that.rating);case _:
+return $default(_that.id,_that.teacherName,_that.date,_that.progressNote,_that.whatWasCovered,_that.homework,_that.rating);case _:
   return orElse();
 
 }
@@ -1063,10 +1062,10 @@ return $default(_that.id,_that.teacherName,_that.subject,_that.date,_that.progre
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String teacherName,  String subject,  String date,  String progressNote,  String whatWasCovered,  String homework,  String rating)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String teacherName,  String date,  String progressNote,  String whatWasCovered,  String homework,  String rating)  $default,) {final _that = this;
 switch (_that) {
 case _StudentProgressModel():
-return $default(_that.id,_that.teacherName,_that.subject,_that.date,_that.progressNote,_that.whatWasCovered,_that.homework,_that.rating);case _:
+return $default(_that.id,_that.teacherName,_that.date,_that.progressNote,_that.whatWasCovered,_that.homework,_that.rating);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1083,10 +1082,10 @@ return $default(_that.id,_that.teacherName,_that.subject,_that.date,_that.progre
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String teacherName,  String subject,  String date,  String progressNote,  String whatWasCovered,  String homework,  String rating)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String teacherName,  String date,  String progressNote,  String whatWasCovered,  String homework,  String rating)?  $default,) {final _that = this;
 switch (_that) {
 case _StudentProgressModel() when $default != null:
-return $default(_that.id,_that.teacherName,_that.subject,_that.date,_that.progressNote,_that.whatWasCovered,_that.homework,_that.rating);case _:
+return $default(_that.id,_that.teacherName,_that.date,_that.progressNote,_that.whatWasCovered,_that.homework,_that.rating);case _:
   return null;
 
 }
@@ -1098,12 +1097,11 @@ return $default(_that.id,_that.teacherName,_that.subject,_that.date,_that.progre
 @JsonSerializable()
 
 class _StudentProgressModel implements StudentProgressModel {
-  const _StudentProgressModel({required this.id, required this.teacherName, required this.subject, required this.date, required this.progressNote, required this.whatWasCovered, required this.homework, required this.rating});
+  const _StudentProgressModel({required this.id, required this.teacherName, required this.date, required this.progressNote, required this.whatWasCovered, required this.homework, required this.rating});
   factory _StudentProgressModel.fromJson(Map<String, dynamic> json) => _$StudentProgressModelFromJson(json);
 
 @override final  String id;
 @override final  String teacherName;
-@override final  String subject;
 @override final  String date;
 @override final  String progressNote;
 @override final  String whatWasCovered;
@@ -1123,16 +1121,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentProgressModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.subject, subject) || other.subject == subject)&&(identical(other.date, date) || other.date == date)&&(identical(other.progressNote, progressNote) || other.progressNote == progressNote)&&(identical(other.whatWasCovered, whatWasCovered) || other.whatWasCovered == whatWasCovered)&&(identical(other.homework, homework) || other.homework == homework)&&(identical(other.rating, rating) || other.rating == rating));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StudentProgressModel&&(identical(other.id, id) || other.id == id)&&(identical(other.teacherName, teacherName) || other.teacherName == teacherName)&&(identical(other.date, date) || other.date == date)&&(identical(other.progressNote, progressNote) || other.progressNote == progressNote)&&(identical(other.whatWasCovered, whatWasCovered) || other.whatWasCovered == whatWasCovered)&&(identical(other.homework, homework) || other.homework == homework)&&(identical(other.rating, rating) || other.rating == rating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,teacherName,subject,date,progressNote,whatWasCovered,homework,rating);
+int get hashCode => Object.hash(runtimeType,id,teacherName,date,progressNote,whatWasCovered,homework,rating);
 
 @override
 String toString() {
-  return 'StudentProgressModel(id: $id, teacherName: $teacherName, subject: $subject, date: $date, progressNote: $progressNote, whatWasCovered: $whatWasCovered, homework: $homework, rating: $rating)';
+  return 'StudentProgressModel(id: $id, teacherName: $teacherName, date: $date, progressNote: $progressNote, whatWasCovered: $whatWasCovered, homework: $homework, rating: $rating)';
 }
 
 
@@ -1143,7 +1141,7 @@ abstract mixin class _$StudentProgressModelCopyWith<$Res> implements $StudentPro
   factory _$StudentProgressModelCopyWith(_StudentProgressModel value, $Res Function(_StudentProgressModel) _then) = __$StudentProgressModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String teacherName, String subject, String date, String progressNote, String whatWasCovered, String homework, String rating
+ String id, String teacherName, String date, String progressNote, String whatWasCovered, String homework, String rating
 });
 
 
@@ -1160,11 +1158,10 @@ class __$StudentProgressModelCopyWithImpl<$Res>
 
 /// Create a copy of StudentProgressModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? teacherName = null,Object? subject = null,Object? date = null,Object? progressNote = null,Object? whatWasCovered = null,Object? homework = null,Object? rating = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? teacherName = null,Object? date = null,Object? progressNote = null,Object? whatWasCovered = null,Object? homework = null,Object? rating = null,}) {
   return _then(_StudentProgressModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,teacherName: null == teacherName ? _self.teacherName : teacherName // ignore: cast_nullable_to_non_nullable
-as String,subject: null == subject ? _self.subject : subject // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as String,progressNote: null == progressNote ? _self.progressNote : progressNote // ignore: cast_nullable_to_non_nullable
 as String,whatWasCovered: null == whatWasCovered ? _self.whatWasCovered : whatWasCovered // ignore: cast_nullable_to_non_nullable
@@ -1468,7 +1465,9 @@ as bool,
 /// @nodoc
 mixin _$SlotModel {
 
- String get id; String get time; bool get isSelected; bool get isAvailable;
+ String get id; String get time;// Student ke timezone mein display time
+ String get teacherTime;// Teacher ka original time (Firestore ke liye)
+ bool get isSelected; bool get isAvailable;
 /// Create a copy of SlotModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1481,16 +1480,16 @@ $SlotModelCopyWith<SlotModel> get copyWith => _$SlotModelCopyWithImpl<SlotModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SlotModel&&(identical(other.id, id) || other.id == id)&&(identical(other.time, time) || other.time == time)&&(identical(other.isSelected, isSelected) || other.isSelected == isSelected)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SlotModel&&(identical(other.id, id) || other.id == id)&&(identical(other.time, time) || other.time == time)&&(identical(other.teacherTime, teacherTime) || other.teacherTime == teacherTime)&&(identical(other.isSelected, isSelected) || other.isSelected == isSelected)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,time,isSelected,isAvailable);
+int get hashCode => Object.hash(runtimeType,id,time,teacherTime,isSelected,isAvailable);
 
 @override
 String toString() {
-  return 'SlotModel(id: $id, time: $time, isSelected: $isSelected, isAvailable: $isAvailable)';
+  return 'SlotModel(id: $id, time: $time, teacherTime: $teacherTime, isSelected: $isSelected, isAvailable: $isAvailable)';
 }
 
 
@@ -1501,7 +1500,7 @@ abstract mixin class $SlotModelCopyWith<$Res>  {
   factory $SlotModelCopyWith(SlotModel value, $Res Function(SlotModel) _then) = _$SlotModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String time, bool isSelected, bool isAvailable
+ String id, String time, String teacherTime, bool isSelected, bool isAvailable
 });
 
 
@@ -1518,10 +1517,11 @@ class _$SlotModelCopyWithImpl<$Res>
 
 /// Create a copy of SlotModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? time = null,Object? isSelected = null,Object? isAvailable = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? time = null,Object? teacherTime = null,Object? isSelected = null,Object? isAvailable = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+as String,teacherTime: null == teacherTime ? _self.teacherTime : teacherTime // ignore: cast_nullable_to_non_nullable
 as String,isSelected: null == isSelected ? _self.isSelected : isSelected // ignore: cast_nullable_to_non_nullable
 as bool,isAvailable: null == isAvailable ? _self.isAvailable : isAvailable // ignore: cast_nullable_to_non_nullable
 as bool,
@@ -1609,10 +1609,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String time,  bool isSelected,  bool isAvailable)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String time,  String teacherTime,  bool isSelected,  bool isAvailable)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SlotModel() when $default != null:
-return $default(_that.id,_that.time,_that.isSelected,_that.isAvailable);case _:
+return $default(_that.id,_that.time,_that.teacherTime,_that.isSelected,_that.isAvailable);case _:
   return orElse();
 
 }
@@ -1630,10 +1630,10 @@ return $default(_that.id,_that.time,_that.isSelected,_that.isAvailable);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String time,  bool isSelected,  bool isAvailable)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String time,  String teacherTime,  bool isSelected,  bool isAvailable)  $default,) {final _that = this;
 switch (_that) {
 case _SlotModel():
-return $default(_that.id,_that.time,_that.isSelected,_that.isAvailable);case _:
+return $default(_that.id,_that.time,_that.teacherTime,_that.isSelected,_that.isAvailable);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1650,10 +1650,10 @@ return $default(_that.id,_that.time,_that.isSelected,_that.isAvailable);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String time,  bool isSelected,  bool isAvailable)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String time,  String teacherTime,  bool isSelected,  bool isAvailable)?  $default,) {final _that = this;
 switch (_that) {
 case _SlotModel() when $default != null:
-return $default(_that.id,_that.time,_that.isSelected,_that.isAvailable);case _:
+return $default(_that.id,_that.time,_that.teacherTime,_that.isSelected,_that.isAvailable);case _:
   return null;
 
 }
@@ -1665,11 +1665,14 @@ return $default(_that.id,_that.time,_that.isSelected,_that.isAvailable);case _:
 @JsonSerializable()
 
 class _SlotModel implements SlotModel {
-  const _SlotModel({required this.id, required this.time, this.isSelected = false, this.isAvailable = true});
+  const _SlotModel({required this.id, required this.time, this.teacherTime = '', this.isSelected = false, this.isAvailable = true});
   factory _SlotModel.fromJson(Map<String, dynamic> json) => _$SlotModelFromJson(json);
 
 @override final  String id;
 @override final  String time;
+// Student ke timezone mein display time
+@override@JsonKey() final  String teacherTime;
+// Teacher ka original time (Firestore ke liye)
 @override@JsonKey() final  bool isSelected;
 @override@JsonKey() final  bool isAvailable;
 
@@ -1686,16 +1689,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SlotModel&&(identical(other.id, id) || other.id == id)&&(identical(other.time, time) || other.time == time)&&(identical(other.isSelected, isSelected) || other.isSelected == isSelected)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SlotModel&&(identical(other.id, id) || other.id == id)&&(identical(other.time, time) || other.time == time)&&(identical(other.teacherTime, teacherTime) || other.teacherTime == teacherTime)&&(identical(other.isSelected, isSelected) || other.isSelected == isSelected)&&(identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,time,isSelected,isAvailable);
+int get hashCode => Object.hash(runtimeType,id,time,teacherTime,isSelected,isAvailable);
 
 @override
 String toString() {
-  return 'SlotModel(id: $id, time: $time, isSelected: $isSelected, isAvailable: $isAvailable)';
+  return 'SlotModel(id: $id, time: $time, teacherTime: $teacherTime, isSelected: $isSelected, isAvailable: $isAvailable)';
 }
 
 
@@ -1706,7 +1709,7 @@ abstract mixin class _$SlotModelCopyWith<$Res> implements $SlotModelCopyWith<$Re
   factory _$SlotModelCopyWith(_SlotModel value, $Res Function(_SlotModel) _then) = __$SlotModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String time, bool isSelected, bool isAvailable
+ String id, String time, String teacherTime, bool isSelected, bool isAvailable
 });
 
 
@@ -1723,10 +1726,11 @@ class __$SlotModelCopyWithImpl<$Res>
 
 /// Create a copy of SlotModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? time = null,Object? isSelected = null,Object? isAvailable = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? time = null,Object? teacherTime = null,Object? isSelected = null,Object? isAvailable = null,}) {
   return _then(_SlotModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+as String,teacherTime: null == teacherTime ? _self.teacherTime : teacherTime // ignore: cast_nullable_to_non_nullable
 as String,isSelected: null == isSelected ? _self.isSelected : isSelected // ignore: cast_nullable_to_non_nullable
 as bool,isAvailable: null == isAvailable ? _self.isAvailable : isAvailable // ignore: cast_nullable_to_non_nullable
 as bool,

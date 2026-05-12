@@ -1,19 +1,53 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-part 'progress_model.freezed.dart';
-part 'progress_model.g.dart';
+class ProgressModel {
+  final String id;
+  final String studentId;
+  final String studentName;
+  final String teacherId;
+  final String teacherName;
+  final String progressNote;
+  final String whatWasCovered;
+  final String homework;
+  final String rating;
+  final DateTime date;
 
-@Freezed()
-abstract class ProgressModel with _$ProgressModel {
-  const factory ProgressModel({
-    required String studentId,
-    required String studentName,
-    @Default('') String progressNote,
-    @Default('') String whatWasCovered,
-    @Default('') String homework,
-    @Default('Good') String rating,
-  }) = _ProgressModel;
+  ProgressModel({
+    required this.id,
+    required this.studentId,
+    required this.studentName,
+    required this.teacherId,
+    required this.teacherName,
+    required this.progressNote,
+    required this.whatWasCovered,
+    required this.homework,
+    required this.rating,
+    required this.date,
+  });
 
-  factory ProgressModel.fromJson(Map<String, dynamic> json) =>
-      _$ProgressModelFromJson(json);
+  factory ProgressModel.fromDoc(DocumentSnapshot doc) {
+    final d = doc.data() as Map<String, dynamic>;
+    final dtValue = d['date'] ?? d['dateTime'] ?? d['createdAt'];
+    DateTime date;
+    if (dtValue is Timestamp) {
+      date = dtValue.toDate();
+    } else if (dtValue is String) {
+      date = DateTime.tryParse(dtValue) ?? DateTime.now();
+    } else {
+      date = DateTime.now();
+    }
+
+    return ProgressModel(
+      id: doc.id,
+      studentId: d['studentId'] ?? '',
+      studentName: d['studentName'] ?? '',
+      teacherId: d['teacherId'] ?? '',
+      teacherName: d['teacherName'] ?? '',
+      progressNote: d['progressNote'] ?? '',
+      whatWasCovered: d['whatWasCovered'] ?? '',
+      homework: d['homework'] ?? '',
+      rating: d['rating'] ?? 'Good',
+      date: date,
+    );
+  }
 }

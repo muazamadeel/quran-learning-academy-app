@@ -1,406 +1,442 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:quran_learning_app/core/theme/app_theme.dart';
 import 'package:quran_learning_app/features/teacher/widget/student_bottom_nav.dart';
-import 'package:quran_learning_app/models/student/student_model.dart';
-import 'package:quran_learning_app/provider/student/student_progress_provider.dart';
+
+import 'package:quran_learning_app/models/progress/progress_model.dart';
+import 'package:quran_learning_app/provider/student/progress_student_provider.dart';
 
 class StudentProgressScreen extends ConsumerWidget {
-  const StudentProgressScreen({super.key});
+  final String studentId;
+  const StudentProgressScreen({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(studentProgressProvider);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final progressAsync = ref.watch(progressStudentProvider(studentId));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: AppColors.white),
-          onPressed: () {},
-        ),
-        title: Text(
+        title: const Text(
           'My Progress',
-          style: TextStyle(
-            color: AppColors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: width * 0.045,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.white,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          Container(
-            color: AppColors.primaryGreen,
-            child: Container(
-              height: 24,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
+      body: progressAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (notes) {
+          return Column(
+            children: [
+              _buildTopCurve(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildSummaryCard(notes.length),
               ),
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                width * 0.04,
-                height * 0.01,
-                width * 0.04,
-                height * 0.03,
+              const SizedBox(height: 16),
+              Expanded(
+                child: notes.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: notes.length,
+                        itemBuilder: (context, index) {
+                          final note = notes[index];
+                          return _buildCard(context, note);
+                        },
+                      ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSummaryRow(
-                    state.totalClassesCompleted,
-                    state.currentStreak,
-                    width,
-                    height,
-                  ),
-                  SizedBox(height: height * 0.025),
-                  Text(
-                    'Progress Notes',
-                    style: TextStyle(
-                      fontSize: width * 0.042,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  SizedBox(height: height * 0.015),
-                  if (state.progressNotes.isEmpty)
-                    _buildEmptyState(width, height)
-                  else
-                    ...state.progressNotes.map(
-                      (note) => _buildProgressCard(note, width, height),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
       bottomNavigationBar: const StudentBottomNav(currentIndex: 3),
     );
   }
 
-  Widget _buildSummaryRow(
-    int totalClasses,
-    int streak,
-    double width,
-    double height,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildSummaryCard(
-            icon: Icons.check_circle_outline,
-            label: 'Classes Done',
-            value: '$totalClasses',
-            color: AppColors.primaryGreen,
-            width: width,
-            height: height,
+  Widget _buildTopCurve() {
+    return Container(
+      color: AppColors.primaryGreen,
+      child: Container(
+        height: 24,
+        decoration: const BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
         ),
-        SizedBox(width: width * 0.03),
-        Expanded(
-          child: _buildSummaryCard(
-            icon: Icons.local_fire_department_outlined,
-            label: 'Day Streak',
-            value: '$streak',
-            color: AppColors.gold,
-            width: width,
-            height: height,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildSummaryCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-    required double width,
-    required double height,
-  }) {
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(
+            'No progress notes yet',
+            style: TextStyle(color: Colors.grey[400], fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(int total) {
     return Container(
-      padding: EdgeInsets.all(width * 0.04),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8),
-        ],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(width * 0.025),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: width * 0.055),
-          ),
-          SizedBox(width: width * 0.025),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: width * 0.05,
-                      fontWeight: FontWeight.w700,
-                      color: color,
-                    ),
-                  ),
-                ),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: width * 0.028,
-                    color: AppColors.textGrey,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
-            ),
+          const Icon(Icons.check_circle, color: Colors.green),
+          const SizedBox(width: 10),
+          Text(
+            'Classes Completed: $total',
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProgressCard(
-    StudentProgressModel note,
-    double width,
-    double height,
-  ) {
-    Color ratingColor;
-    switch (note.rating) {
-      case 'Excellent':
-        ratingColor = AppColors.success;
-        break;
-      case 'Good':
-        ratingColor = AppColors.primaryGreen;
-        break;
-      case 'Average':
-        ratingColor = AppColors.pending;
-        break;
-      default:
-        ratingColor = AppColors.rejected;
-    }
-
+  Widget _buildCard(BuildContext context, ProgressModel note) {
     return Container(
-      margin: EdgeInsets.only(bottom: height * 0.015),
-      padding: EdgeInsets.all(width * 0.04),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _openNoteSheet(context, note),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          note.teacherName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: AppColors.lightGold,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              note.rating,
+                              style: const TextStyle(
+                                color: AppColors.primaryGreen,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('MMM d, yyyy').format(note.date),
+                    style: const TextStyle(
+                      color: AppColors.textGrey,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    note.progressNote,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textGrey,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 14,
+                        color: AppColors.primaryGreen,
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'View full details',
+                        style: TextStyle(
+                          color: AppColors.primaryGreen,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Separated for easier editing ──────────────────────────────────────────
+
+extension _Sheet on StudentProgressScreen {
+  void _openNoteSheet(BuildContext context, ProgressModel note) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _NoteSheet(note: note),
+    );
+  }
+}
+
+class _NoteSheet extends StatelessWidget {
+  final ProgressModel note;
+  const _NoteSheet({required this.note});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        left: 24,
+        right: 24,
+        top: 12,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           Row(
             children: [
-              CircleAvatar(
-                radius: width * 0.055,
-                backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
-                child: Text(
-                  note.teacherName[0],
-                  style: TextStyle(
-                    color: AppColors.primaryGreen,
-                    fontWeight: FontWeight.bold,
-                    fontSize: width * 0.04,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  color: AppColors.primaryGreen,
                 ),
               ),
-              SizedBox(width: width * 0.03),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       note.teacherName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: width * 0.037,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                         color: AppColors.textDark,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.menu_book_outlined,
-                          size: width * 0.03,
-                          color: AppColors.gold,
-                        ),
-                        SizedBox(width: width * 0.01),
-                        Text(
-                          note.subject,
-                          style: TextStyle(
-                            fontSize: width * 0.029,
-                            color: AppColors.gold,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(width: width * 0.025),
-                        Icon(
-                          Icons.access_time,
-                          size: width * 0.03,
-                          color: AppColors.textGrey,
-                        ),
-                        SizedBox(width: width * 0.01),
-                        Expanded(
-                          child: Text(
-                            note.date,
-                            style: TextStyle(
-                              fontSize: width * 0.029,
-                              color: AppColors.textGrey,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      DateFormat('EEEE, MMMM d, yyyy').format(note.date),
+                      style: const TextStyle(
+                        color: AppColors.textGrey,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.025,
-                  vertical: width * 0.012,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: ratingColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ratingColor.withValues(alpha: 0.3)),
-                ),
-                child: Text(
-                  note.rating,
-                  style: TextStyle(
-                    fontSize: width * 0.028,
-                    color: ratingColor,
-                    fontWeight: FontWeight.w600,
+                  color: AppColors.lightGold.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.lightGold.withValues(alpha: 0.3),
                   ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.star_rounded,
+                      color: AppColors.lightGold,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      note.rating,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFB8860B),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          SizedBox(height: height * 0.012),
-          _buildNoteRow(
-            Icons.notes_outlined,
-            'Progress',
-            note.progressNote,
-            width,
+          const SizedBox(height: 32),
+          _buildSection(
+            icon: Icons.history_edu_rounded,
+            title: "What was covered",
+            content: note.whatWasCovered.isNotEmpty
+                ? note.whatWasCovered
+                : "No details provided.",
+            color: const Color(0xFF1565C0),
           ),
-          SizedBox(height: height * 0.008),
-          _buildNoteRow(
-            Icons.book_outlined,
-            'Covered',
-            note.whatWasCovered,
-            width,
+          const SizedBox(height: 20),
+          _buildSection(
+            icon: Icons.assignment_outlined,
+            title: "Homework",
+            content: note.homework.isNotEmpty
+                ? note.homework
+                : "No homework assigned.",
+            color: const Color(0xFFE65100),
           ),
-          SizedBox(height: height * 0.008),
-          _buildNoteRow(
-            Icons.assignment_outlined,
-            'Homework',
-            note.homework,
-            width,
+          const SizedBox(height: 20),
+          _buildSection(
+            icon: Icons.comment_outlined,
+            title: "Teacher's Note",
+            content: note.progressNote,
+            color: AppColors.primaryGreen,
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Close',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNoteRow(
-    IconData icon,
-    String label,
-    String value,
-    double width,
-  ) {
-    return Row(
+  Widget _buildSection({
+    required IconData icon,
+    required String title,
+    required String content,
+    required Color color,
+  }) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: width * 0.035, color: AppColors.textGrey),
-        SizedBox(width: width * 0.02),
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '$label: ',
-                  style: TextStyle(
-                    fontSize: width * 0.031,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                TextSpan(
-                  text: value,
-                  style: TextStyle(
-                    fontSize: width * 0.031,
-                    color: AppColors.textGrey,
-                  ),
-                ),
-              ],
+        Row(
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          ),
+          child: Text(
+            content,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.textDark,
+              height: 1.5,
             ),
           ),
         ),
       ],
     );
   }
-
-  Widget _buildEmptyState(double width, double height) {
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(height: height * 0.05),
-          Icon(
-            Icons.bar_chart_outlined,
-            size: width * 0.16,
-            color: AppColors.textLight,
-          ),
-          SizedBox(height: height * 0.02),
-          Text(
-            'No progress notes yet',
-            style: TextStyle(
-              fontSize: width * 0.04,
-              color: AppColors.textGrey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
-

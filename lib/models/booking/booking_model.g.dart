@@ -13,7 +13,6 @@ _BookingModel _$BookingModelFromJson(Map<String, dynamic> json) =>
       studentImage: json['studentImage'] as String,
       date: json['date'] as String,
       time: json['time'] as String,
-      subject: json['subject'] as String,
       status: json['status'] as String? ?? 'pending',
       studentId: json['studentId'] as String?,
       teacherId: json['teacherId'] as String?,
@@ -24,6 +23,9 @@ _BookingModel _$BookingModelFromJson(Map<String, dynamic> json) =>
       meetingLink: json['meetingLink'] as String?,
       studentRating: (json['studentRating'] as num?)?.toDouble(),
       studentReview: json['studentReview'] as String?,
+      teacherTimezone: json['teacherTimezone'] as String? ?? '',
+      studentTimezone: json['studentTimezone'] as String? ?? '',
+      teacherSlotTime: json['teacherSlotTime'] as String? ?? '',
     );
 
 Map<String, dynamic> _$BookingModelToJson(_BookingModel instance) =>
@@ -33,7 +35,6 @@ Map<String, dynamic> _$BookingModelToJson(_BookingModel instance) =>
       'studentImage': instance.studentImage,
       'date': instance.date,
       'time': instance.time,
-      'subject': instance.subject,
       'status': instance.status,
       'studentId': instance.studentId,
       'teacherId': instance.teacherId,
@@ -42,4 +43,7 @@ Map<String, dynamic> _$BookingModelToJson(_BookingModel instance) =>
       'meetingLink': instance.meetingLink,
       'studentRating': instance.studentRating,
       'studentReview': instance.studentReview,
+      'teacherTimezone': instance.teacherTimezone,
+      'studentTimezone': instance.studentTimezone,
+      'teacherSlotTime': instance.teacherSlotTime,
     };

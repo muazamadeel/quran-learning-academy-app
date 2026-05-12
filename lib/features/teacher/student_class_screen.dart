@@ -8,13 +8,13 @@ import 'package:quran_learning_app/provider/class_provider.dart';
 
 class StudentClassScreen extends ConsumerStatefulWidget {
   final String teacherName;
-  final String subject;
+  // final String subject;
   final String time;
 
   const StudentClassScreen({
     super.key,
     required this.teacherName,
-    required this.subject,
+    // required this.subject,
     required this.time,
   });
 
@@ -33,7 +33,7 @@ class _StudentClassScreenState extends ConsumerState<StudentClassScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(classProvider.notifier)
-          .initClass(widget.teacherName, widget.subject, widget.time);
+          .initClass(widget.teacherName, widget.time);
     });
     _startTimer();
   }
@@ -123,13 +123,13 @@ class _StudentClassScreenState extends ConsumerState<StudentClassScreen> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
-                Text(
-                  widget.subject,
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: width * 0.03,
-                  ),
-                ),
+                // Text(
+                //   widget.subject,
+                //   style: TextStyle(
+                //     color: Colors.white54,
+                //     fontSize: width * 0.03,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -374,4 +374,3 @@ class _ControlButton extends StatelessWidget {
     );
   }
 }
-

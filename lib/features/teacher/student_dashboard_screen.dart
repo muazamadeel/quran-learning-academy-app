@@ -5,7 +5,7 @@ import 'package:quran_learning_app/core/navigation/app_router.dart';
 import 'package:quran_learning_app/core/theme/app_theme.dart';
 import 'package:quran_learning_app/models/student/student_model.dart';
 import 'package:quran_learning_app/provider/auth/auth_provider.dart';
-import 'package:quran_learning_app/provider/student/student_provider.dart';
+import 'package:quran_learning_app/provider/student/student_dashboard_provider.dart';
 import 'package:quran_learning_app/features/teacher/widget/student_bottom_nav.dart';
 import 'package:quran_learning_app/features/teacher/widget/student_class_card.dart';
 import 'package:quran_learning_app/core/widgets/app_drawer.dart';
@@ -17,8 +17,8 @@ class StudentDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(studentDashboardProvider);
     final authState = ref.watch(authProvider);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
+    final h = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -26,16 +26,15 @@ class StudentDashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Dashboard',
           style: TextStyle(
             color: AppColors.white,
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: w * 0.045,
           ),
         ),
         actions: [
-          // Subscription icon
           IconButton(
             icon: const Icon(
               Icons.workspace_premium_rounded,
@@ -56,158 +55,166 @@ class StudentDashboardScreen extends ConsumerWidget {
           ? const Center(
               child: CircularProgressIndicator(color: AppColors.primaryGreen),
             )
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(width * 0.04),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Welcome Card ────────────────────────────────
-                  _buildWelcomeCard(
-                    context,
-                    authState.user?.name ?? state.student?.name ?? 'Student',
-                    width,
-                    height,
-                  ),
-                  SizedBox(height: height * 0.015),
-
-                  // ── Trial Banner ────────────────────────────────
-                  _buildTrialBanner(
-                    context,
-                    state.trialDaysLeft,
-                    width,
-                    height,
-                  ),
-                  SizedBox(height: height * 0.025),
-
-                  // ── Choose Your Course ──────────────────────────
-                  Text(
-                    'Choose Your Course',
-                    style: TextStyle(
-                      fontSize: width * 0.042,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
+          : RefreshIndicator(
+              color: AppColors.primaryGreen,
+              onRefresh: () =>
+                  ref.read(studentDashboardProvider.notifier).refresh(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(w * 0.04),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Welcome Card ──────────────────────────────────
+                    _WelcomeCard(
+                      name:
+                          authState.user?.name ??
+                          state.student?.name ??
+                          'Student',
+                      w: w,
+                      h: h,
                     ),
-                  ),
-                  SizedBox(height: height * 0.012),
-                  _buildCourseGrid(context, width, height),
-                  SizedBox(height: height * 0.025),
+                    SizedBox(height: h * 0.015),
 
-                  // ── Available Teachers ──────────────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Available Teachers',
-                        style: TextStyle(
-                          fontSize: width * 0.042,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => context.go(AppRoutes.teacherList),
-                        child: Text(
-                          'See All',
+                    // ── Trial Banner ──────────────────────────────────
+                    _TrialBanner(daysLeft: state.trialDaysLeft, w: w, h: h),
+                    SizedBox(height: h * 0.025),
+
+                    // ── Available Teachers ────────────────────────────
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Available Teachers',
                           style: TextStyle(
-                            fontSize: width * 0.033,
-                            color: AppColors.primaryGreen,
-                            fontWeight: FontWeight.w600,
+                            fontSize: w * 0.042,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textDark,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: height * 0.012),
-
-                  if (state.availableTeachers.isEmpty)
-                    _buildNoTeachers(width, height)
-                  else
-                    SizedBox(
-                      height: height * 0.22,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: state.availableTeachers.length,
-                        separatorBuilder: (_, _) =>
-                            SizedBox(width: width * 0.03),
-                        itemBuilder: (context, index) {
-                          final teacher = state.availableTeachers[index];
-                          return _buildTeacherCard(
-                            context,
-                            teacher,
-                            width,
-                            height,
-                          );
-                        },
-                      ),
-                    ),
-                  SizedBox(height: height * 0.025),
-
-                  // ── Upcoming Classes ────────────────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Upcoming Classes',
-                        style: TextStyle(
-                          fontSize: width * 0.042,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => context.go(AppRoutes.studentSchedule),
-                        child: Text(
-                          'View All',
-                          style: TextStyle(
-                            fontSize: width * 0.033,
-                            color: AppColors.primaryGreen,
-                            fontWeight: FontWeight.w600,
+                        GestureDetector(
+                          onTap: () => context.go(AppRoutes.teacherList),
+                          child: Text(
+                            'See All',
+                            style: TextStyle(
+                              fontSize: w * 0.033,
+                              color: AppColors.primaryGreen,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: height * 0.012),
-
-                  if (state.upcomingClasses.isEmpty)
-                    _buildNoClasses(width, height)
-                  else
-                    ...state.upcomingClasses.map(
-                      (cls) => StudentClassCard(
-                        classModel: cls,
-                        onJoin: () {
-                          context.go(
-                            AppRoutes.studentClassroom,
-                            extra: {
-                              'teacherName': cls.teacherName,
-                              'subject': cls.subject,
-                              'time': cls.time,
-                            },
-                          );
-                        },
-                      ),
+                      ],
                     ),
-                  SizedBox(height: height * 0.02),
-                ],
+                    SizedBox(height: h * 0.012),
+
+                    if (state.availableTeachers.isEmpty)
+                      _EmptyBox(
+                        icon: Icons.person_search_outlined,
+                        message: 'No teachers available yet',
+                        w: w,
+                        h: h,
+                      )
+                    else
+                      // Horizontal scroll list
+                      SizedBox(
+                        height: h * 0.22,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: state.availableTeachers.length,
+                          separatorBuilder: (_, _) => SizedBox(width: w * 0.03),
+                          itemBuilder: (context, index) {
+                            final teacher = state.availableTeachers[index];
+                            return _TeacherCard(teacher: teacher, w: w, h: h);
+                          },
+                        ),
+                      ),
+                    SizedBox(height: h * 0.025),
+
+                    // ── Upcoming Classes ──────────────────────────────
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Upcoming Classes',
+                          style: TextStyle(
+                            fontSize: w * 0.042,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go(AppRoutes.studentSchedule),
+                          child: Text(
+                            'View All',
+                            style: TextStyle(
+                              fontSize: w * 0.033,
+                              color: AppColors.primaryGreen,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: h * 0.012),
+
+                    if (state.upcomingClasses.isEmpty)
+                      _EmptyBox(
+                        icon: Icons.calendar_today_outlined,
+                        message: 'No upcoming classes',
+                        subtitle: 'Book a class with a teacher to get started!',
+                        w: w,
+                        h: h,
+                      )
+                    else
+                      ...state.upcomingClasses.map(
+                        (cls) => StudentClassCard(
+                          classModel: cls,
+                          onJoin: () {
+                            context.push(
+                              AppRoutes.studentClassroom,
+                              extra: {
+                                'channelName': cls.id,
+                                'otherPersonName': cls.teacherName,
+                                'time': cls.time,
+                                'scheduledAt': cls.scheduledAt,
+                                'date': cls.date,
+                                'slotTime': cls.time,
+                                'durationMinutes': cls.durationMinutes ?? 30,
+                                'studentId': cls.studentId ?? '',
+                                'teacherId': cls.teacherId ?? '',
+                                'studentName': authState.user?.name ??
+                                    state.student?.name ??
+                                    'Student',
+                                'isTeacher': false,
+                              },
+                            );
+                          },
+                        ),
+                      ),
+
+                    SizedBox(height: h * 0.02),
+                  ],
+                ),
               ),
             ),
       bottomNavigationBar: const StudentBottomNav(currentIndex: 0),
     );
   }
+}
 
-  // ── Welcome Card ────────────────────────────────────────────────────────
-  Widget _buildWelcomeCard(
-    BuildContext context,
-    String name,
-    double width,
-    double height,
-  ) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// WELCOME CARD
+// ═══════════════════════════════════════════════════════════════════════════════
+class _WelcomeCard extends StatelessWidget {
+  final String name;
+  final double w, h;
+  const _WelcomeCard({required this.name, required this.w, required this.h});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: width * 0.05,
-        vertical: height * 0.02,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: w * 0.05, vertical: h * 0.02),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primaryGreen, AppColors.lightGreen],
@@ -231,27 +238,24 @@ class StudentDashboardScreen extends ConsumerWidget {
               children: [
                 Text(
                   'As-salamu Alaykum!',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: width * 0.032,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: w * 0.032),
                 ),
-                SizedBox(height: height * 0.005),
+                SizedBox(height: h * 0.005),
                 Text(
                   name,
                   style: TextStyle(
                     color: AppColors.white,
-                    fontSize: width * 0.05,
+                    fontSize: w * 0.05,
                     fontWeight: FontWeight.w700,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
-                SizedBox(height: height * 0.006),
+                SizedBox(height: h * 0.006),
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.03,
-                    vertical: width * 0.01,
+                    horizontal: w * 0.03,
+                    vertical: w * 0.01,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.gold.withValues(alpha: 0.3),
@@ -261,7 +265,7 @@ class StudentDashboardScreen extends ConsumerWidget {
                     '📖 Ready to Learn',
                     style: TextStyle(
                       color: AppColors.lightGold,
-                      fontSize: width * 0.028,
+                      fontSize: w * 0.028,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -270,52 +274,51 @@ class StudentDashboardScreen extends ConsumerWidget {
             ),
           ),
           CircleAvatar(
-            radius: width * 0.075,
+            radius: w * 0.075,
             backgroundColor: Colors.white24,
-            child: Icon(
-              Icons.person,
-              color: AppColors.white,
-              size: width * 0.08,
-            ),
+            child: Icon(Icons.person, color: AppColors.white, size: w * 0.08),
           ),
         ],
       ),
     );
   }
+}
 
-  // ── Trial Banner ────────────────────────────────────────────────────────
-  Widget _buildTrialBanner(
-    BuildContext context,
-    int daysLeft,
-    double width,
-    double height,
-  ) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// TRIAL BANNER
+// ═══════════════════════════════════════════════════════════════════════════════
+class _TrialBanner extends StatelessWidget {
+  final int daysLeft;
+  final double w, h;
+  const _TrialBanner({
+    required this.daysLeft,
+    required this.w,
+    required this.h,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final isUrgent = daysLeft <= 7;
+    final color = isUrgent ? AppColors.rejected : AppColors.gold;
 
     return GestureDetector(
       onTap: () => context.go(AppRoutes.subscription),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(width * 0.04),
+        padding: EdgeInsets.all(w * 0.04),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: isUrgent
-                ? [
-                    AppColors.rejected.withValues(alpha: 0.3),
-                    AppColors.rejected.withValues(alpha: 0.3),
-                  ]
-                : [
-                    AppColors.gold.withValues(alpha: 0.3),
-                    AppColors.gold.withValues(alpha: 0.3),
-                  ],
+            colors: [
+              color.withValues(alpha: 0.3),
+              color.withValues(alpha: 0.15),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: (isUrgent ? AppColors.rejected : AppColors.gold)
-                  .withValues(alpha: 0.3),
+              color: color.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -324,8 +327,8 @@ class StudentDashboardScreen extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              width: width * 0.11,
-              height: width * 0.11,
+              width: w * 0.11,
+              height: w * 0.11,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
@@ -335,10 +338,10 @@ class StudentDashboardScreen extends ConsumerWidget {
                     ? Icons.warning_amber_rounded
                     : Icons.access_time_rounded,
                 color: AppColors.white,
-                size: width * 0.06,
+                size: w * 0.06,
               ),
             ),
-            SizedBox(width: width * 0.03),
+            SizedBox(width: w * 0.03),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,15 +351,17 @@ class StudentDashboardScreen extends ConsumerWidget {
                     style: TextStyle(
                       color: AppColors.white,
                       fontWeight: FontWeight.w700,
-                      fontSize: width * 0.037,
+                      fontSize: w * 0.037,
                     ),
                   ),
-                  SizedBox(height: height * 0.003),
+                  SizedBox(height: h * 0.003),
                   Text(
-                    'Your 30 days free trial${daysLeft > 0 ? " — $daysLeft days remaining" : " has ended"}',
+                    daysLeft > 0
+                        ? '$daysLeft day${daysLeft == 1 ? '' : 's'} remaining'
+                        : 'Your free trial has ended',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      fontSize: width * 0.029,
+                      color: Colors.white.withValues(alpha: 0.85),
+                      fontSize: w * 0.029,
                     ),
                   ),
                 ],
@@ -365,40 +370,42 @@ class StudentDashboardScreen extends ConsumerWidget {
             Icon(
               Icons.arrow_forward_ios,
               color: AppColors.white,
-              size: width * 0.04,
+              size: w * 0.04,
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  // ── Teacher Card (horizontal scroll) ────────────────────────────────────
-  Widget _buildTeacherCard(
-    BuildContext context,
-    TeacherListModel teacher,
-    double width,
-    double height,
-  ) {
-    // Count available days
+// ═══════════════════════════════════════════════════════════════════════════════
+// TEACHER CARD
+// ═══════════════════════════════════════════════════════════════════════════════
+class _TeacherCard extends StatelessWidget {
+  final TeacherListModel teacher;
+  final double w, h;
+  const _TeacherCard({required this.teacher, required this.w, required this.h});
+
+  @override
+  Widget build(BuildContext context) {
     int availableDays = 0;
     teacher.availability.forEach((_, v) {
       if (v is Map && v['enabled'] == true) availableDays++;
     });
 
     return GestureDetector(
-      onTap: () {
-        context.go(AppRoutes.studentBooking, extra: {'teacher': teacher});
-      },
+      onTap: () =>
+          context.go(AppRoutes.studentBooking, extra: {'teacher': teacher}),
       child: Container(
-        width: width * 0.42,
-        padding: EdgeInsets.all(width * 0.035),
+        width: w * 0.42,
+        padding: EdgeInsets.all(w * 0.035),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -407,30 +414,34 @@ class StudentDashboardScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Avatar + name
             Row(
               children: [
                 CircleAvatar(
-                  radius: width * 0.05,
+                  radius: w * 0.05,
                   backgroundColor: AppColors.primaryGreen.withValues(
                     alpha: 0.1,
                   ),
-                  child: Text(
-                    teacher.name.isNotEmpty ? teacher.name[0] : '?',
-                    style: TextStyle(
-                      color: AppColors.primaryGreen,
-                      fontWeight: FontWeight.bold,
-                      fontSize: width * 0.04,
-                    ),
-                  ),
+                  backgroundImage: teacher.profileImage.isNotEmpty
+                      ? NetworkImage(teacher.profileImage)
+                      : null,
+                  child: teacher.profileImage.isEmpty
+                      ? Text(
+                          teacher.name.isNotEmpty ? teacher.name[0] : '?',
+                          style: TextStyle(
+                            color: AppColors.primaryGreen,
+                            fontWeight: FontWeight.bold,
+                            fontSize: w * 0.04,
+                          ),
+                        )
+                      : null,
                 ),
-                SizedBox(width: width * 0.02),
+                SizedBox(width: w * 0.02),
                 Expanded(
                   child: Text(
                     teacher.name,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: width * 0.033,
+                      fontSize: w * 0.033,
                       color: AppColors.textDark,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -439,23 +450,22 @@ class StudentDashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            SizedBox(height: height * 0.008),
+            SizedBox(height: h * 0.006),
 
-            // Country
             if (teacher.country.isNotEmpty)
               Row(
                 children: [
                   Icon(
                     Icons.location_on_outlined,
-                    size: width * 0.032,
+                    size: w * 0.032,
                     color: AppColors.textGrey,
                   ),
-                  SizedBox(width: width * 0.01),
+                  SizedBox(width: w * 0.01),
                   Expanded(
                     child: Text(
                       teacher.country,
                       style: TextStyle(
-                        fontSize: width * 0.027,
+                        fontSize: w * 0.027,
                         color: AppColors.textGrey,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -463,21 +473,20 @@ class StudentDashboardScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            SizedBox(height: height * 0.005),
+            SizedBox(height: h * 0.004),
 
-            // Available days
             Row(
               children: [
                 Icon(
                   Icons.calendar_today_outlined,
-                  size: width * 0.032,
+                  size: w * 0.032,
                   color: AppColors.success,
                 ),
-                SizedBox(width: width * 0.01),
+                SizedBox(width: w * 0.01),
                 Text(
                   '$availableDays days/week',
                   style: TextStyle(
-                    fontSize: width * 0.027,
+                    fontSize: w * 0.027,
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
                   ),
@@ -487,29 +496,26 @@ class StudentDashboardScreen extends ConsumerWidget {
 
             const Spacer(),
 
-            // Book button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  context.go(
-                    AppRoutes.studentBooking,
-                    extra: {'teacher': teacher},
-                  );
-                },
+                onPressed: () => context.go(
+                  AppRoutes.studentBooking,
+                  extra: {'teacher': teacher},
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: AppColors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: height * 0.01),
+                  padding: EdgeInsets.symmetric(vertical: h * 0.01),
                   elevation: 0,
                 ),
                 child: Text(
                   'Book Now',
                   style: TextStyle(
-                    fontSize: width * 0.03,
+                    fontSize: w * 0.03,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -520,12 +526,30 @@ class StudentDashboardScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  // ── Empty states ────────────────────────────────────────────────────────
-  Widget _buildNoTeachers(double width, double height) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMPTY BOX
+// ═══════════════════════════════════════════════════════════════════════════════
+class _EmptyBox extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  final String? subtitle;
+  final double w, h;
+
+  const _EmptyBox({
+    required this.icon,
+    required this.message,
+    required this.w,
+    required this.h,
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(width * 0.06),
+      padding: EdgeInsets.all(w * 0.06),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
@@ -533,192 +557,26 @@ class StudentDashboardScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.person_search_outlined,
-            size: width * 0.12,
-            color: AppColors.textLight,
-          ),
-          SizedBox(height: height * 0.01),
+          Icon(icon, size: w * 0.12, color: AppColors.textLight),
+          SizedBox(height: h * 0.01),
           Text(
-            'No teachers available yet',
+            message,
             style: TextStyle(
-              fontSize: width * 0.035,
+              fontSize: w * 0.035,
               color: AppColors.textGrey,
               fontWeight: FontWeight.w500,
             ),
           ),
+          if (subtitle != null) ...[
+            SizedBox(height: h * 0.005),
+            Text(
+              subtitle!,
+              style: TextStyle(fontSize: w * 0.03, color: AppColors.textLight),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ],
       ),
-    );
-  }
-
-  Widget _buildNoClasses(double width, double height) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(width * 0.06),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.textLight.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.calendar_today_outlined,
-            size: width * 0.12,
-            color: AppColors.textLight,
-          ),
-          SizedBox(height: height * 0.01),
-          Text(
-            'No upcoming classes',
-            style: TextStyle(
-              fontSize: width * 0.035,
-              color: AppColors.textGrey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: height * 0.005),
-          Text(
-            'Book a class with a teacher to get started!',
-            style: TextStyle(
-              fontSize: width * 0.03,
-              color: AppColors.textLight,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Course Grid ────────────────────────────────────────────────────────
-  Widget _buildCourseGrid(BuildContext context, double width, double height) {
-    const courses = [
-      {
-        'name': 'Tajweed',
-        'icon': Icons.record_voice_over_rounded,
-        'color1': Color(0xFF1B8A4F),
-        'color2': Color(0xFF2ECC71),
-        'desc': 'Correct Pronunciation',
-      },
-      {
-        'name': 'Hifz',
-        'icon': Icons.favorite_rounded,
-        'color1': Color(0xFFE74C3C),
-        'color2': Color(0xFFFF6B6B),
-        'desc': 'Quran Memorization',
-      },
-      {
-        'name': 'Quran Reading',
-        'icon': Icons.auto_stories_rounded,
-        'color1': Color(0xFF2980B9),
-        'color2': Color(0xFF3498DB),
-        'desc': 'Learn to Read',
-      },
-      {
-        'name': 'Tafseer',
-        'icon': Icons.lightbulb_rounded,
-        'color1': Color(0xFFF39C12),
-        'color2': Color(0xFFFFC107),
-        'desc': 'Understanding Quran',
-      },
-      {
-        'name': 'Arabic Language',
-        'icon': Icons.translate_rounded,
-        'color1': Color(0xFF8E44AD),
-        'color2': Color(0xFFAB47BC),
-        'desc': 'Learn Arabic',
-      },
-      {
-        'name': 'Noorani Qaida',
-        'icon': Icons.abc_rounded,
-        'color1': Color(0xFF00897B),
-        'color2': Color(0xFF26A69A),
-        'desc': 'Basic Foundations',
-      },
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: width * 0.025,
-        mainAxisSpacing: width * 0.025,
-        childAspectRatio: 0.82,
-      ),
-      itemCount: courses.length,
-      itemBuilder: (context, index) {
-        final course = courses[index];
-        return GestureDetector(
-          onTap: () {
-            context.go(
-              AppRoutes.teacherList,
-              extra: {'course': course['name']},
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [course['color1'] as Color, course['color2'] as Color],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: (course['color1'] as Color).withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: width * 0.11,
-                  height: width * 0.11,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    course['icon'] as IconData,
-                    color: AppColors.white,
-                    size: width * 0.055,
-                  ),
-                ),
-                SizedBox(height: height * 0.008),
-                Text(
-                  course['name'] as String,
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: width * 0.028,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 2),
-                Text(
-                  course['desc'] as String,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    fontSize: width * 0.02,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
-
-
-

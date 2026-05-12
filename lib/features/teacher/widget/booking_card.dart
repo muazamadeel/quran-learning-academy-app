@@ -101,17 +101,6 @@ class BookingCard extends StatelessWidget {
                           color: AppColors.textGrey,
                         ),
                         SizedBox(width: width * 0.01),
-                        Expanded(
-                          child: Text(
-                            booking.subject,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: width * 0.03,
-                              color: AppColors.textGrey,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -249,4 +238,3 @@ class _StatusBadge extends StatelessWidget {
     );
   }
 }
-

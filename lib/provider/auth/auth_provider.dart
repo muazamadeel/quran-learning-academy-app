@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quran_learning_app/core/service/notification_service.dart';
 import 'package:quran_learning_app/models/auth/user_model.dart';
 
 class AuthState {
@@ -93,6 +94,10 @@ class AuthNotifier extends Notifier<AuthState> {
         'createdAt': FieldValue.serverTimestamp(),
       });
       await cred.user!.updateDisplayName(name.trim());
+      
+      // Update FCM Token
+      await _updateFCMToken(uid);
+      
       state = AuthState(user: userModel);
       return true;
     } on FirebaseAuthException catch (e) {
@@ -111,10 +116,27 @@ class AuthNotifier extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await _auth.signInWithEmailAndPassword(
+      final cred = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+      
+      // Update FCM Token
+      await _updateFCMToken(cred.user!.uid);
+
+      // Fetch user explicitly to avoid race condition with authStateChanges
+      final doc = await _db.collection('users').doc(cred.user!.uid).get();
+      if (doc.exists && doc.data() != null) {
+        final data = <String, dynamic>{'id': cred.user!.uid, ...doc.data()!};
+        if (data['createdAt'] is Timestamp) {
+          data['createdAt'] =
+              (data['createdAt'] as Timestamp).toDate().toIso8601String();
+        }
+        state = AuthState(user: UserModel.fromJson(data), isLoading: false);
+      } else {
+        state = const AuthState(isLoading: false);
+      }
+      
       return true;
     } on FirebaseAuthException catch (e) {
       state = state.copyWith(isLoading: false, error: _mapError(e.code));
@@ -122,6 +144,80 @@ class AuthNotifier extends Notifier<AuthState> {
     } catch (_) {
       state = state.copyWith(
           isLoading: false, error: 'Something went wrong. Please try again.');
+      return false;
+    }
+  }
+
+  Future<void> _updateFCMToken(String uid) async {
+    try {
+      final token = await NotificationService.getFCMToken();
+      if (token != null) {
+        await _db.collection('users').doc(uid).update({
+          'fcmToken': token,
+          'lastTokenUpdate': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (_) {
+      // Non-critical, ignore
+    }
+  }
+
+  Future<bool> resetPassword(String email) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      state = state.copyWith(isLoading: false);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      state = state.copyWith(isLoading: false, error: _mapError(e.code));
+      return false;
+    } catch (_) {
+      state = state.copyWith(
+          isLoading: false, error: 'Failed to send reset email. Try again.');
+      return false;
+    }
+  }
+
+  Future<bool> updateProfile({
+    String? name,
+    String? phone,
+    String? profileImage,
+  }) async {
+    final user = state.user;
+    if (user == null) return false;
+
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updates = <String, dynamic>{};
+      if (name != null) updates['name'] = name.trim();
+      if (phone != null) updates['phone'] = phone.trim();
+      if (profileImage != null) updates['profileImage'] = profileImage;
+
+      if (updates.isEmpty) {
+        state = state.copyWith(isLoading: false);
+        return true;
+      }
+
+      await _db.collection('users').doc(user.id).update(updates);
+      
+      if (name != null) {
+        await _auth.currentUser?.updateDisplayName(name.trim());
+      }
+      if (profileImage != null) {
+        await _auth.currentUser?.updatePhotoURL(profileImage);
+      }
+
+      final updatedUser = user.copyWith(
+        name: name?.trim() ?? user.name,
+        phone: phone?.trim() ?? user.phone,
+        profileImage: profileImage ?? user.profileImage,
+      );
+      
+      state = AuthState(user: updatedUser);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+          isLoading: false, error: 'Failed to update profile.');
       return false;
     }
   }

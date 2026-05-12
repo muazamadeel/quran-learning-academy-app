@@ -1,6 +1,5 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:freezed_annotation/freezed_annotation.dart';
-
 // part 'booking_model.freezed.dart';
 // part 'booking_model.g.dart';
 
@@ -15,7 +14,7 @@
 //     required String date,
 //     required String time,
 //     required String subject,
-//     @Default('pending') String status, // pending | confirmed | completed
+//     @Default('pending') String status,
 //     String? studentId,
 //     String? teacherId,
 //     DateTime? scheduledAt,
@@ -30,29 +29,52 @@
 
 //   factory BookingModel.fromFirestore(DocumentSnapshot doc) {
 //     final data = doc.data() as Map<String, dynamic>;
-//     final scheduledAt = (data['scheduledAt'] as Timestamp?)?.toDate();
 
-//     String dateStr = '';
-//     String timeStr = '';
-//     if (scheduledAt != null) {
+//     // ── scheduledAt: dateTime field use karo ─────────────────────────────────
+//     final DateTime? scheduledAt =
+//         (data['dateTime'] as Timestamp?)?.toDate() ??
+//         (data['scheduledAt'] as Timestamp?)?.toDate();
+
+//     // ── date string: Firestore ka 'date' field directly lo ───────────────────
+//     // fallback: scheduledAt se banao
+//     String dateStr = data['date'] as String? ?? '';
+//     if (dateStr.isEmpty && scheduledAt != null) {
 //       final now = DateTime.now();
 //       final today = DateTime(now.year, now.month, now.day);
 //       final tomorrow = today.add(const Duration(days: 1));
 //       final classDay = DateTime(
-//           scheduledAt.year, scheduledAt.month, scheduledAt.day);
-
+//         scheduledAt.year,
+//         scheduledAt.month,
+//         scheduledAt.day,
+//       );
 //       if (classDay == today) {
 //         dateStr = 'Today';
 //       } else if (classDay == tomorrow) {
 //         dateStr = 'Tomorrow';
 //       } else {
-//         final months = [
-//           '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-//           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+//         const months = [
+//           '',
+//           'Jan',
+//           'Feb',
+//           'Mar',
+//           'Apr',
+//           'May',
+//           'Jun',
+//           'Jul',
+//           'Aug',
+//           'Sep',
+//           'Oct',
+//           'Nov',
+//           'Dec',
 //         ];
 //         dateStr = '${scheduledAt.day} ${months[scheduledAt.month]}';
 //       }
+//     }
 
+//     // ── time string: slotTime field directly lo ───────────────────────────────
+//     // fallback: scheduledAt se banao
+//     String timeStr = data['slotTime'] as String? ?? '';
+//     if (timeStr.isEmpty && scheduledAt != null) {
 //       final hour = scheduledAt.hour;
 //       final minute = scheduledAt.minute.toString().padLeft(2, '0');
 //       final period = hour >= 12 ? 'PM' : 'AM';
@@ -63,7 +85,7 @@
 //     return BookingModel(
 //       id: doc.id,
 //       studentName: data['studentName'] ?? '',
-//       studentImage: data['studentImage'] ?? '',
+//       studentImage: data['studentImage'] ?? data['studentAvatarUrl'] ?? '',
 //       date: dateStr,
 //       time: timeStr,
 //       subject: data['subject'] ?? '',
@@ -85,7 +107,9 @@
 //     required String studentImage,
 //     required String subject,
 //     required DateTime scheduledAt,
-//     int durationMinutes = 45,
+//     required String slotTime,
+//     required String date,
+//     int durationMinutes = 30,
 //     String status = 'pending',
 //   }) {
 //     return {
@@ -94,13 +118,17 @@
 //       'studentName': studentName,
 //       'studentImage': studentImage,
 //       'subject': subject,
-//       'scheduledAt': Timestamp.fromDate(scheduledAt),
+//       'dateTime': Timestamp.fromDate(scheduledAt),
+//       'slotTime': slotTime,
+//       'date': date,
 //       'durationMinutes': durationMinutes,
 //       'status': status,
 //       'createdAt': FieldValue.serverTimestamp(),
 //     };
 //   }
 // }
+// lib/models/booking/booking_model.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'booking_model.freezed.dart';
@@ -115,8 +143,7 @@ abstract class BookingModel with _$BookingModel {
     required String studentName,
     required String studentImage,
     required String date,
-    required String time,
-    required String subject,
+    required String time, // Display time (viewer ke timezone mein)
     @Default('pending') String status,
     String? studentId,
     String? teacherId,
@@ -125,6 +152,11 @@ abstract class BookingModel with _$BookingModel {
     String? meetingLink,
     double? studentRating,
     String? studentReview,
+    // ── Timezone fields ──────────────────────────────────────────────────────
+    @Default('') String teacherTimezone, // Teacher ka timezone
+    @Default('') String studentTimezone, // Student ka timezone
+    @Default('')
+    String teacherSlotTime, // Teacher ke timezone mein original time
   }) = _BookingModel;
 
   factory BookingModel.fromJson(Map<String, dynamic> json) =>
@@ -133,13 +165,12 @@ abstract class BookingModel with _$BookingModel {
   factory BookingModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
-    // ── scheduledAt: dateTime field use karo ─────────────────────────────────
+    // ── scheduledAt ──────────────────────────────────────────────────────────
     final DateTime? scheduledAt =
         (data['dateTime'] as Timestamp?)?.toDate() ??
         (data['scheduledAt'] as Timestamp?)?.toDate();
 
-    // ── date string: Firestore ka 'date' field directly lo ───────────────────
-    // fallback: scheduledAt se banao
+    // ── date string ──────────────────────────────────────────────────────────
     String dateStr = data['date'] as String? ?? '';
     if (dateStr.isEmpty && scheduledAt != null) {
       final now = DateTime.now();
@@ -174,9 +205,13 @@ abstract class BookingModel with _$BookingModel {
       }
     }
 
-    // ── time string: slotTime field directly lo ───────────────────────────────
-    // fallback: scheduledAt se banao
-    String timeStr = data['slotTime'] as String? ?? '';
+    // ── time string ──────────────────────────────────────────────────────────
+    // studentSlotTime: student ke timezone mein converted time (booking ke waqt save hota hai)
+    // slotTime: teacher ka original time
+    // Agar studentSlotTime available hai to use karo, warna slotTime
+    String timeStr =
+        data['studentSlotTime'] as String? ?? data['slotTime'] as String? ?? '';
+
     if (timeStr.isEmpty && scheduledAt != null) {
       final hour = scheduledAt.hour;
       final minute = scheduledAt.minute.toString().padLeft(2, '0');
@@ -191,7 +226,6 @@ abstract class BookingModel with _$BookingModel {
       studentImage: data['studentImage'] ?? data['studentAvatarUrl'] ?? '',
       date: dateStr,
       time: timeStr,
-      subject: data['subject'] ?? '',
       status: data['status'] ?? 'pending',
       studentId: data['studentId'],
       teacherId: data['teacherId'],
@@ -200,6 +234,9 @@ abstract class BookingModel with _$BookingModel {
       meetingLink: data['meetingLink'],
       studentRating: (data['studentRating'] as num?)?.toDouble(),
       studentReview: data['studentReview'],
+      teacherTimezone: data['teacherTimezone'] as String? ?? '',
+      studentTimezone: data['studentTimezone'] as String? ?? '',
+      teacherSlotTime: data['slotTime'] as String? ?? '',
     );
   }
 
@@ -208,10 +245,12 @@ abstract class BookingModel with _$BookingModel {
     required String studentId,
     required String studentName,
     required String studentImage,
-    required String subject,
     required DateTime scheduledAt,
-    required String slotTime,
+    required String slotTime, // Teacher ka original time
+    required String studentSlotTime, // Student ka converted time
     required String date,
+    required String teacherTimezone,
+    required String studentTimezone,
     int durationMinutes = 30,
     String status = 'pending',
   }) {
@@ -220,12 +259,14 @@ abstract class BookingModel with _$BookingModel {
       'studentId': studentId,
       'studentName': studentName,
       'studentImage': studentImage,
-      'subject': subject,
       'dateTime': Timestamp.fromDate(scheduledAt),
       'slotTime': slotTime,
+      'studentSlotTime': studentSlotTime,
       'date': date,
       'durationMinutes': durationMinutes,
       'status': status,
+      'teacherTimezone': teacherTimezone,
+      'studentTimezone': studentTimezone,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }

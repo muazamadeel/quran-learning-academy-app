@@ -6,6 +6,7 @@ import 'package:quran_learning_app/core/theme/app_theme.dart';
 import 'package:quran_learning_app/features/teacher/widget/student_bottom_nav.dart';
 import 'package:quran_learning_app/features/teacher/widget/student_class_card.dart';
 import 'package:quran_learning_app/provider/student/student_schedule_provider.dart';
+import 'package:quran_learning_app/provider/auth/auth_provider.dart';
 
 class StudentScheduleScreen extends ConsumerWidget {
   const StudentScheduleScreen({super.key});
@@ -13,9 +14,17 @@ class StudentScheduleScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(studentScheduleProvider);
+    final authState = ref.watch(authProvider);
     final notifier = ref.read(studentScheduleProvider.notifier);
+    final upcomingAsync = ref.watch(upcomingBookingsProvider);
+    final completedAsync = ref.watch(completedBookingsProvider);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+
+    // Tab ke hisaab se current list
+    final currentAsync = state.selectedTab == 0
+        ? upcomingAsync
+        : completedAsync;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -51,41 +60,63 @@ class StudentScheduleScreen extends ConsumerWidget {
           _buildTabBar(context, state.selectedTab, notifier, width, height),
           SizedBox(height: height * 0.01),
           Expanded(
-            child: state.currentList.isEmpty
-                ? _buildEmptyState(state.selectedTab, width, height)
-                : ListView.builder(
-                    padding: EdgeInsets.fromLTRB(
-                      width * 0.04,
-                      height * 0.01,
-                      width * 0.04,
-                      height * 0.02,
-                    ),
-                    itemCount: state.currentList.length,
-                    itemBuilder: (context, index) {
-                      final cls = state.currentList[index];
-                      return StudentClassCard(
-                        classModel: cls,
-                        onJoin: () {
-                          context.go(
-                            AppRoutes.studentClassroom,
-                            extra: {
-                              'teacherName': cls.teacherName,
-                              'subject': cls.subject,
-                              'time': cls.time,
-                            },
-                          );
-                        },
-                        onCancel: state.selectedTab == 0
-                            ? () => _showCancelDialog(
-                                context,
-                                cls.id,
-                                notifier,
-                                width,
-                              )
-                            : null,
-                      );
-                    },
+            child: currentAsync.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryGreen),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  'Something went wrong',
+                  style: TextStyle(
+                    color: AppColors.textGrey,
+                    fontSize: width * 0.035,
                   ),
+                ),
+              ),
+              data: (list) => list.isEmpty
+                  ? _buildEmptyState(state.selectedTab, width, height)
+                  : ListView.builder(
+                      padding: EdgeInsets.fromLTRB(
+                        width * 0.04,
+                        height * 0.01,
+                        width * 0.04,
+                        height * 0.02,
+                      ),
+                      itemCount: list.length,
+                      itemBuilder: (context, index) {
+                        final cls = list[index];
+                        return StudentClassCard(
+                          classModel: cls,
+                          onJoin: () {
+                            context.push(
+                              AppRoutes.studentClassroom,
+                              extra: {
+                                'channelName': cls.id,
+                                'otherPersonName': cls.teacherName,
+                                'time': cls.time,
+                                'scheduledAt': cls.scheduledAt,
+                                'date': cls.date,
+                                'slotTime': cls.time,
+                                'durationMinutes': cls.durationMinutes ?? 30,
+                                'studentId': cls.studentId ?? '',
+                                'teacherId': cls.teacherId ?? '',
+                                'studentName': authState.user?.name ?? 'Student',
+                                'isTeacher': false,
+                              },
+                            );
+                          },
+                          onCancel: state.selectedTab == 0
+                              ? () => _showCancelDialog(
+                                  context,
+                                  cls.id,
+                                  notifier,
+                                  width,
+                                )
+                              : null,
+                        );
+                      },
+                    ),
+            ),
           ),
         ],
       ),
@@ -238,4 +269,3 @@ class StudentScheduleScreen extends ConsumerWidget {
     );
   }
 }
-

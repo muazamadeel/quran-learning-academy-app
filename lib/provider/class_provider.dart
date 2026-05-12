@@ -41,13 +41,9 @@ class ClassNotifier extends Notifier<ClassState> {
   @override
   ClassState build() => const ClassState();
 
-  void initClass(String studentName, String subject, String time) {
+  void initClass(String studentName, String time) {
     state = state.copyWith(
-      classInfo: ClassModel(
-        studentName: studentName,
-        subject: subject,
-        time: time,
-      ),
+      classInfo: ClassModel(studentName: studentName, time: time, subject: ''),
     );
   }
 

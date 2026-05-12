@@ -272,11 +272,6 @@ class _ConfirmedBookingCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      _InfoRow(
-                        icon: Icons.menu_book_outlined,
-                        text: booking.subject,
-                        w: w,
-                      ),
                     ],
                   ),
                 ),
@@ -315,7 +310,13 @@ class _ConfirmedBookingCard extends StatelessWidget {
                   w: w,
                 ),
                 SizedBox(width: w * 0.05),
-                _InfoRow(icon: Icons.access_time, text: booking.time, w: w),
+                _InfoRow(
+                  icon: Icons.access_time,
+                  text: booking.teacherSlotTime.isNotEmpty
+                      ? booking.teacherSlotTime
+                      : booking.time,
+                  w: w,
+                ),
                 if (booking.durationMinutes != null) ...[
                   SizedBox(width: w * 0.05),
                   _InfoRow(
@@ -392,11 +393,6 @@ class _CompletedBookingCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      _InfoRow(
-                        icon: Icons.menu_book_outlined,
-                        text: booking.subject,
-                        w: w,
-                      ),
                     ],
                   ),
                 ),
@@ -418,7 +414,13 @@ class _CompletedBookingCard extends StatelessWidget {
                   w: w,
                 ),
                 SizedBox(width: w * 0.05),
-                _InfoRow(icon: Icons.access_time, text: booking.time, w: w),
+                _InfoRow(
+                  icon: Icons.access_time,
+                  text: booking.teacherSlotTime.isNotEmpty
+                      ? booking.teacherSlotTime
+                      : booking.time,
+                  w: w,
+                ),
               ],
             ),
           ),

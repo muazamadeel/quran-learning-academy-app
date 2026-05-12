@@ -62,7 +62,7 @@ class TeacherListNotifier extends Notifier<TeacherListState> {
           totalStudents: d['totalStudents'] ?? 0,
           profileImage: d['profileImage'] ?? '',
           isAvailable: true,
-          subjects: List<String>.from(d['subjects'] ?? []),
+
           country: d['country'] ?? '',
           timezone: d['timezone'] ?? '',
           availability: Map<String, dynamic>.from(d['availability'] ?? {}),
@@ -96,13 +96,7 @@ class TeacherListNotifier extends Notifier<TeacherListState> {
       list = list
           .where(
             (t) =>
-                t.name.toLowerCase().contains(
-                  state.searchQuery.toLowerCase(),
-                ) ||
-                t.subjects.any(
-                  (s) =>
-                      s.toLowerCase().contains(state.searchQuery.toLowerCase()),
-                ),
+                t.name.toLowerCase().contains(state.searchQuery.toLowerCase()),
           )
           .toList();
     }

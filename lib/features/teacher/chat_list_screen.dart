@@ -239,8 +239,16 @@ class _ChatUserTile extends StatelessWidget {
         margin: EdgeInsets.only(bottom: height * 0.012),
         padding: EdgeInsets.all(width * 0.035),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: user.unreadCount > 0
+              ? AppColors.primaryGreen.withValues(alpha: 0.06)
+              : AppColors.white,
           borderRadius: BorderRadius.circular(14),
+          border: user.unreadCount > 0
+              ? Border.all(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.35),
+                  width: 1,
+                )
+              : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -282,7 +290,9 @@ class _ChatUserTile extends StatelessWidget {
                         child: Text(
                           user.name,
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: user.unreadCount > 0
+                                ? FontWeight.w800
+                                : FontWeight.w600,
                             fontSize: width * 0.038,
                             color: AppColors.textDark,
                           ),
@@ -300,7 +310,7 @@ class _ChatUserTile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'Student',
+                          user.role[0].toUpperCase() + user.role.substring(1),
                           style: TextStyle(
                             fontSize: width * 0.022,
                             fontWeight: FontWeight.w600,
@@ -355,20 +365,25 @@ class _ChatUserTile extends StatelessWidget {
                 SizedBox(height: height * 0.005),
                 if (user.unreadCount > 0)
                   Container(
-                    width: width * 0.055,
-                    height: width * 0.055,
+                    constraints: BoxConstraints(
+                      minWidth: width * 0.055,
+                      minHeight: width * 0.055,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.018,
+                      vertical: 2,
+                    ),
                     decoration: const BoxDecoration(
                       color: AppColors.primaryGreen,
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.all(Radius.circular(999)),
                     ),
-                    child: Center(
-                      child: Text(
-                        '${user.unreadCount}',
-                        style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: width * 0.028,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      user.unreadCount > 99 ? '99+' : '${user.unreadCount}',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: width * 0.026,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
