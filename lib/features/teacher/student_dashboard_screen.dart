@@ -42,13 +42,6 @@ class StudentDashboardScreen extends ConsumerWidget {
             ),
             onPressed: () => context.go(AppRoutes.subscription),
           ),
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.white,
-            ),
-            onPressed: () {},
-          ),
         ],
       ),
       body: state.isLoading
@@ -182,7 +175,8 @@ class StudentDashboardScreen extends ConsumerWidget {
                                 'durationMinutes': cls.durationMinutes ?? 30,
                                 'studentId': cls.studentId ?? '',
                                 'teacherId': cls.teacherId ?? '',
-                                'studentName': authState.user?.name ??
+                                'studentName':
+                                    authState.user?.name ??
                                     state.student?.name ??
                                     'Student',
                                 'isTeacher': false,

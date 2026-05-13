@@ -910,15 +910,6 @@ class DashboardScreen extends ConsumerWidget {
             fontSize: w * 0.045,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.white,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: teacherAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -999,8 +990,9 @@ class DashboardScreen extends ConsumerWidget {
                         'scheduledAt': cls.scheduledAt,
                         'date':
                             '${cls.scheduledAt.year}-${cls.scheduledAt.month.toString().padLeft(2, '0')}-${cls.scheduledAt.day.toString().padLeft(2, '0')}',
-                        'slotTime':
-                            DateFormat('h:mm a').format(cls.scheduledAt),
+                        'slotTime': DateFormat(
+                          'h:mm a',
+                        ).format(cls.scheduledAt),
                         'durationMinutes': cls.durationMinutes ?? 30,
                         'studentId': cls.studentId ?? '',
                         'teacherId': cls.teacherId ?? '',

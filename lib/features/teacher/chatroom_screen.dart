@@ -242,11 +242,6 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
               color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              Icons.videocam_rounded,
-              color: AppColors.lightGold,
-              size: w * 0.05,
-            ),
           ),
         ],
       ),
