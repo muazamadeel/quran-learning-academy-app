@@ -50,9 +50,12 @@ class _ClassroomScreenState extends ConsumerState<ClassroomScreen> {
   bool _sessionReady = false;
   String _scheduledDisplay = '';
 
+  late AgoraNotifier _agoraNotifier;
+
   @override
   void initState() {
     super.initState();
+    _agoraNotifier = ref.read(agoraProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrapSession());
   }
 
@@ -113,7 +116,7 @@ class _ClassroomScreenState extends ConsumerState<ClassroomScreen> {
 
   @override
   void dispose() {
-    ref.read(agoraProvider.notifier).leaveCall();
+    _agoraNotifier.leaveCall();
     super.dispose();
   }
 
@@ -444,7 +447,9 @@ class _LiveScreen extends StatelessWidget {
           ),
 
         // Local PiP
-        if (agoraState.isJoined && !agoraState.isCameraOff && !agoraState.isScreenSharing)
+        if (agoraState.isJoined &&
+            !agoraState.isCameraOff &&
+            !agoraState.isScreenSharing)
           Positioned(
             top: h * 0.02,
             right: w * 0.04,
