@@ -16,7 +16,6 @@ import 'package:intl/intl.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 class _C {
   static const bg = Color(0xFF0A0A14);
-  static const surface = Color(0xFF111827);
   static const green = Color(0xFF2D9C6A);
   static const greenLight = Color(0xFF5DC994);
   static const redDark = Color(0xFFC62828);
