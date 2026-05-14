@@ -46,14 +46,12 @@ class _ClassScreenState extends ConsumerState<ClassScreen> {
 
       var scheduled = DateTime(now.year, now.month, now.day, hour, minute);
 
-      // اگر وقت پہلے نکل گیا تو کل کو set کریں
       if (scheduled.isBefore(now)) {
         scheduled = scheduled.add(const Duration(days: 1));
       }
 
       return scheduled;
     } catch (e) {
-      // Default: 30 minutes سے
       return now.add(const Duration(minutes: 30));
     }
   }
@@ -78,8 +76,8 @@ class _ClassScreenState extends ConsumerState<ClassScreen> {
             AppRoutes.progressNotes,
             extra: {
               'studentName': widget.studentName,
-              'studentId': 'student_123', // یہ actual student ID سے آنی چاہیے
-              'teacherId': 'teacher_456', // یہ actual teacher ID سے آنی چاہیے
+              'studentId': 'student_123',
+              'teacherId': 'teacher_456',
             },
           );
         }
@@ -140,7 +138,7 @@ class _WaitingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEarly = remaining.inMinutes > 25; // اگر 25+ منٹ پہلے آئے
+    final isEarly = remaining.inMinutes > 25;
 
     return Container(
       width: double.infinity,
