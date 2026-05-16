@@ -60,8 +60,8 @@ A comprehensive, high-performance Flutter application designed to bridge the gap
 ### Steps
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/quran_learning_app.git
-   cd quran_learning_app
+   git clone https://github.com/muazamadeel/quran-learning-academy-app.git
+   cd quran-learning-app
    ```
 
 2. **Install dependencies**:
