@@ -26,17 +26,7 @@ A comprehensive, high-performance Flutter application designed to bridge the gap
 
 ---
 
-## 📸 Screenshots
 
-| Splash & Auth | Student Dashboard | Teacher Dashboard |
-| :---: | :---: | :---: |
-| ![Splash](https://via.placeholder.com/200x400?text=Splash+Screen) | ![Student](https://via.placeholder.com/200x400?text=Student+Dashboard) | ![Teacher](https://via.placeholder.com/200x400?text=Teacher+Dashboard) |
-
-| Video Classroom | Chat System | Booking Flow |
-| :---: | :---: | :---: |
-| ![Classroom](https://via.placeholder.com/200x400?text=Video+Class) | ![Chat](https://via.placeholder.com/200x400?text=Chat+Interface) | ![Booking](https://via.placeholder.com/200x400?text=Booking+System) |
-
----
 
 ## 🛠️ Tech Stack
 
