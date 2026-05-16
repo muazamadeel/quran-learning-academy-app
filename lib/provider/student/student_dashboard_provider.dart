@@ -104,7 +104,7 @@ class StudentDashboardNotifier extends Notifier<StudentDashboardState> {
           .collection('bookings')
           .where('studentId', isEqualTo: _uid)
           .where('status', isEqualTo: 'confirmed')
-          .orderBy('dateTime')
+        .orderBy('dateTime')
           // .limit(10)
           .get();
 
